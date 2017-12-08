@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                                    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:padding="5dp"
+                                    card_view:cardCornerRadius="5dp"
+                                    card_view:cardElevation="3dp"
+                                    android:clickable="true"
+                                    card_view:cardUseCompatPadding="true"
+
+
+    >
+
+    <LinearLayout
+        android:background="@drawable/state_background"
+
+        android:id="@+id/relLay_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="5dp"
+        android:layout_margin="1dp"
+
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:orientation="horizontal"
+            >
+
+            <TextView
+                android:id="@+id/textView_job_location"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                android:text="OPeration Engineer"
+                android:textColor="@color/color_app_blue"
+                android:textSize="@dimen/text_job_title"
+                />
+
+            <TextView
+                android:id="@+id/textView_facility_name"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Facilty Name"
+                android:textColor="@color/color_app_blue"
+                android:textSize="@dimen/text_job_title"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_marginRight="4dp"
+                    android:layout_width="@dimen/icon_small"
+                    android:layout_height="@dimen/icon_small"
+                    android:src="@drawable/icons_location"
+                    />
+
+                <TextView
+                    android:visibility="gone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Area: "
+                    android:textColor="@color/color_grey_dark"
+                    android:textSize="@dimen/text_job_details"
+                    />
+
+                <TextView
+                    android:id="@+id/textView_area"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Area:"
+                    android:textColor="@color/color_grey_dark_text"
+                    android:textSize="@dimen/text_job_details"
+                    />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:layout_marginTop="@dimen/lay_mrginTop"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_marginRight="4dp"
+
+                    android:layout_width="@dimen/icon_small"
+                    android:layout_height="@dimen/icon_small"
+                    android:src="@drawable/icons_calendar"
+                    />
+
+                <TextView
+                    android:visibility="gone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Date: "
+                    android:textColor="@color/color_grey_dark"
+                    android:textSize="@dimen/text_job_details"
+                    />
+
+                <TextView
+                    android:id="@+id/textView_assign_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nov 10, 2017"
+                    android:textColor="@color/color_grey_dark_text"
+                    android:textSize="@dimen/text_job_details"
+                    />
+            </LinearLayout>
+
+
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

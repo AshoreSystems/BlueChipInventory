@@ -1,0 +1,223 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center"
+                android:background="@color/white"
+
+        >
+
+        <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:padding="@dimen/login_page_padding">
+
+    <!-- Login progress -->
+    <ProgressBar
+        android:id="@+id/login_progress"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+       />
+
+
+
+        <LinearLayout
+            android:id="@+id/email_login_form"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_centerInParent="true">
+
+            <LinearLayout
+                android:id="@+id/linearlay_jobs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/bluechip_log"/>
+
+
+
+            </LinearLayout>
+
+
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/prompt_email"
+                    android:inputType="textEmailAddress"
+                    android:maxLines="1"
+                    android:nextFocusDown="@+id/password"
+
+                    android:drawableRight="@drawable/icons_user"
+                    android:text="@string/login_id"
+                    android:singleLine="true"
+                    android:textSize="@dimen/input_text"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:text="@string/login_pwd"
+                    android:id="@+id/password"
+                    android:drawableRight="@drawable/icons_lock"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/prompt_password"
+                    android:imeActionId="@+id/login"
+                    android:imeOptions="actionUnspecified"
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:textSize="@dimen/input_text"
+                    android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <Button
+                android:id="@+id/button_login"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/login"
+                android:textColor="@color/white"
+                android:background="@color/color_app_blue"
+                android:textStyle="bold"/>
+
+            <Button
+                android:layout_gravity="center"
+                android:id="@+id/button_forget_pwd"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/forgot_pwd"
+                android:textColor="@drawable/text_color_grey"
+                android:background="@null"
+                android:textStyle="bold"
+                android:gravity="top|center_horizontal"
+
+               />
+
+
+
+        </LinearLayout>
+</RelativeLayout>
+
+
+
+    <RelativeLayout
+        android:id="@+id/relLay_logo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:background="@color/white"
+        android:visibility="gone"
+        android:padding="@dimen/login_page_padding">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_centerInParent="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/bluechip_log"/>
+
+
+
+            </LinearLayout>
+
+
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/prompt_email"
+                    android:inputType="textEmailAddress"
+                    android:maxLines="1"
+                    android:drawableRight="@drawable/icons_user"
+                    android:text="@string/login_id"
+                    android:singleLine="true"
+                    android:textSize="@dimen/input_text"
+                    android:visibility="invisible"
+                />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText android:visibility="invisible"
+                    android:text="@string/login_pwd"
+                    android:drawableRight="@drawable/icons_lock"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/prompt_password"
+                    android:imeActionId="@+id/login"
+                    android:imeOptions="actionUnspecified"
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:textSize="@dimen/input_text"
+                    android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <Button android:visibility="invisible"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/login"
+                android:textColor="@color/white"
+                android:background="@color/color_app_blue"
+                android:textStyle="bold"/>
+
+            <Button android:visibility="invisible"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/forgot_pwd"
+                android:textColor="@drawable/text_color_grey"
+                android:background="@null"
+                android:textStyle="bold"
+                android:gravity="top|center_horizontal"
+
+                />
+
+
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+    </RelativeLayout>

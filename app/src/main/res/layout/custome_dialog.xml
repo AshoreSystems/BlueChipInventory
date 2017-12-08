@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:gravity="center"
+              android:padding="1dp"
+    android:background="@color/color_app_blue">
+
+    <LinearLayout
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Need Record Permission"
+                android:textColor="@color/color_grey_dark"
+                android:textSize="@dimen/input_text"
+                />
+
+            <TextView
+                android:layout_marginTop="@dimen/fab_margin"
+                android:id="@+id/textView_msg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="This app needs Record permission."
+                android:textColor="@color/color_grey_dark"
+                android:textSize="@dimen/small_title_text"
+                />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:gravity="right"
+            android:orientation="horizontal"
+            android:weightSum="6"
+            >
+
+
+            <Button
+                android:id="@+id/button_cancel"
+
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:gravity="center"
+                android:text="CANCEL"
+                android:textColor="@drawable/text_color"/>
+
+            <Button
+                android:id="@+id/button_ok"
+
+
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:gravity="center"
+                android:text="OK"
+                android:textColor="@drawable/text_color"/>
+
+            <Button
+
+                android:id="@+id/button_settings"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/button_height"
+                android:layout_weight="1"
+                android:background="@null"
+                android:gravity="center"
+                android:text="OK"
+                android:textColor="@drawable/text_color"/>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

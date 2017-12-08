@@ -1,0 +1,135 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="@color/white"
+             tools:context="com.bluechip.inventory.fragment.DashboardFragment">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        >
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="50dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+
+            <RelativeLayout
+                android:id="@+id/relative_joblist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+
+                <ImageView
+
+                    android:layout_width="@dimen/home_icon_bg"
+                    android:layout_height="@dimen/home_icon_bg"
+                    android:background="@drawable/bg_circle"
+
+                    />
+
+
+                <ImageView
+                    android:layout_centerInParent="true"
+                    android:id="@+id/imageView_jobs"
+                    android:layout_width= "@dimen/home_icon"
+                    android:layout_height="@dimen/home_icon"
+                    android:padding="@dimen/image_padding"
+                    android:src="@drawable/icons_task_white"
+
+                    />
+
+
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/nav_jobs"
+                android:textColor="@color/color_grey_dark"
+                android:textSize="@dimen/text_menu"
+                android:textStyle="bold"
+                />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="50dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:gravity="center"
+                android:id="@+id/relative_report"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_width="@dimen/home_icon_bg"
+                    android:layout_height="@dimen/home_icon_bg"
+                    android:background="@drawable/bg_circle"
+                    />
+
+                <ImageView
+                    android:layout_centerInParent="true"
+                    android:id="@+id/imageView_view_report"
+                    android:layout_width="@dimen/home_icon"
+                    android:layout_height="@dimen/home_icon"
+                    android:padding="@dimen/image_padding"
+                    android:src="@drawable/icons_report_white"/>
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/nav_viewreport"
+                android:textColor="@color/color_grey_dark"
+                android:textSize="@dimen/text_menu"
+                android:textStyle="bold"/>
+            />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            >
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="50dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/imageView_gif"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    />
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>

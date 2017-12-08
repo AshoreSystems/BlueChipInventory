@@ -1,0 +1,345 @@
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/linearly_inventory"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/white"
+
+              tools:context="com.bluechip.inventory.activity.InventoryActivity">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Employee # "
+                android:textColor="@color/color_grey_dark"
+                android:textSize="@dimen/small_title_text"
+                />
+
+            <TextView
+                android:id="@+id/textView_emp_id"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/input_text_height"
+                android:background="@drawable/bg_square_filled"
+                android:gravity="center_vertical"
+                android:paddingLeft="5dp"
+                android:text="Emp-0001"
+
+                android:textColor="@color/color_grey_dark_text"
+                android:textSize="@dimen/input_text"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/title_top_margin"
+                android:text="Area "
+                android:textColor="@color/color_grey_dark"
+                android:textSize="@dimen/small_title_text"
+
+                />
+
+            <TextView
+                android:id="@+id/textView_area"
+
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/input_text_height"
+                android:background="@drawable/bg_square_filled"
+                android:gravity="center_vertical"
+                android:paddingLeft="5dp"
+                android:text="CheckStand"
+                android:textColor="@color/color_grey_dark_text"
+                android:textSize="@dimen/input_text"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/title_top_margin"
+                android:text="Sub-Area "
+                android:textColor="@color/color_grey_dark"
+                android:textSize="@dimen/small_title_text"
+
+                />
+
+            <TextView
+                android:id="@+id/textView_emp_sub_area"
+
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/input_text_height"
+                android:background="@drawable/bg_square_filled"
+                android:gravity="center_vertical"
+                android:paddingLeft="5dp"
+                android:text="ABC"
+                android:textColor="@color/color_grey_dark_text"
+                android:textSize="@dimen/input_text"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/title_top_margin"
+                android:text="Section"
+                android:textColor="@color/color_grey_dark"
+                android:textSize="@dimen/small_title_text"
+
+                />
+
+            <TextView
+                android:id="@+id/textView_section"
+
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/input_text_height"
+                android:background="@drawable/bg_square_filled"
+                android:gravity="center_vertical"
+                android:paddingLeft="5dp"
+                android:text="Section 1"
+                android:textColor="@color/color_grey_dark_text"
+                android:textSize="@dimen/input_text"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/title_top_margin"
+                android:text="Sub-Section"
+                android:textColor="@color/color_grey_dark"
+                android:textSize="@dimen/small_title_text"
+
+                />
+
+            <TextView
+                android:id="@+id/textView_sub_section"
+
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/input_text_height"
+                android:background="@drawable/bg_square_filled"
+                android:gravity="center_vertical"
+                android:paddingLeft="5dp"
+                android:text="Sub-Section 1"
+                android:textColor="@color/color_grey_dark_text"
+                android:textSize="@dimen/input_text"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/title_top_margin"
+                android:text="SKU #"
+                android:textColor="@color/color_grey_dark"
+                android:textSize="@dimen/small_title_text"
+
+                />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+
+                <EditText
+                    android:id="@+id/editText_sku_test"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/input_text_height"
+                    android:background="@drawable/selected_edit_text"
+                    android:focusableInTouchMode="false"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="5dp"
+                    android:text=""
+                    android:textColor="@color/color_orange"
+                    android:textSize="@dimen/input_text"
+                    />
+
+
+                <EditText
+                    android:id="@+id/editText_sku"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/input_text_height"
+                    android:background="@drawable/selected_edit_text"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="5dp"
+                    android:text=""
+                    android:textColor="@color/color_grey_dark_text"
+                    android:textSize="@dimen/input_text"
+                    />
+
+            </RelativeLayout>
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/title_top_margin"
+                android:text="Price"
+                android:textColor="@color/color_grey_dark"
+                android:textSize="@dimen/small_title_text"
+
+                />
+
+            <EditText
+                android:id="@+id/editText_price"
+
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/input_text_height"
+                android:background="@drawable/selected_edit_text"
+                android:gravity="center_vertical"
+                android:paddingLeft="5dp"
+                android:text="$"
+                android:textColor="@color/color_grey_dark_text"
+                android:textSize="@dimen/input_text"
+                />
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/title_top_margin"
+                android:text="Quantity"
+                android:textColor="@color/color_grey_dark"
+                android:textSize="@dimen/small_title_text"
+
+                />
+
+            <EditText
+                android:id="@+id/editText_quantity"
+
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/input_text_height"
+                android:background="@drawable/selected_edit_text"
+                android:gravity="center_vertical"
+                android:paddingLeft="5dp"
+                android:text="1"
+                android:textColor="@color/color_grey_dark_text"
+                android:textSize="@dimen/input_text"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/title_top_margin"
+                android:orientation="horizontal"
+                >
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Description"
+                    android:textColor="@color/color_grey_dark"
+                    android:textSize="@dimen/small_title_text"
+
+                    />
+
+                <TextView
+
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Test Speech"
+                    android:textColor="@color/color_grey_dark"
+                    android:textSize="@dimen/small_title_text"
+
+                    />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/editText_desc"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/details_text_height"
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/selected_edit_text"
+                    android:gravity="top"
+                    android:paddingLeft="5dp"
+                    android:text="1"
+                    android:textColor="@color/color_grey_dark_text"
+                    android:textSize="@dimen/input_text"
+                    />
+
+                <EditText
+
+                    android:id="@+id/editText_test"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/details_text_height"
+
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/selected_edit_text"
+                    android:gravity="top"
+                    android:paddingLeft="5dp"
+                    android:text="1"
+                    android:textColor="@color/color_grey_dark_text"
+                    android:textSize="@dimen/input_text"
+                    />
+            </LinearLayout>
+
+
+            <LinearLayout
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/title_top_margin"
+                android:gravity="right|center_vertical"
+                android:orientation="horizontal"
+                >
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"></LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="3"
+                    android:gravity="center"
+                    >
+
+                    <Button
+                        android:id="@+id/button_reset"
+
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/button_height"
+                        android:layout_marginRight="5dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_button_grey"
+                        android:gravity="center"
+                        android:text="RESET"
+                        android:textColor="@drawable/text_color"/>
+
+                    <Button
+                        android:id="@+id/button_save"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/button_height"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_button_blue"
+                        android:gravity="center"
+                        android:text="SAVE"
+                        android:textColor="#ffffff"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
