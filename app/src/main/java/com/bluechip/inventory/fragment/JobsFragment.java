@@ -206,12 +206,21 @@ public class JobsFragment extends Fragment implements View.OnClickListener {
         switch (v.getId()) {
 
             case R.id.fab_add:
+
+                AppConstant.ADD_INVENTORY_STATUS = "new";
+
                 startActivity(new Intent(getActivity(), InventoryActivity.class));
                 getActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 break;
 
 
             case R.id.fab_upload:
+
+                try {
+                    ((MainActivity) getActivity()).uploadInventory();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                /* DatabaseHandler DH= new DatabaseHandler(context);
                 SQLiteDatabase db = DH.OpenWritable();
 
@@ -230,15 +239,35 @@ public class JobsFragment extends Fragment implements View.OnClickListener {
 
         int job_id_temp = job_id;
 
+
+        JobModel jobModel = new JobModel();
+        JobsDB jobsDB = new JobsDB();
+
+        jobModel = jobsDB.getJobDetails(context, job_id);
+
+        // save job details
+        AppConstant.KEY_JOB_ID = jobModel.getJob_id();
+        AppConstant.KEY_JOB_CUST_ID = jobModel.getJob_cust_id();
+        AppConstant.KEY_JOB_LOC_ID = jobModel.getLocation_id();
+
+
+        // auditor_job_table
         String table_inventory_auditor_job = "table_inventory_aud"
                 + session.getString(session.KEY_USER_ID).toString()
                 + "_job"
-                + job_id;  // format
-
-        session.putString(session.KEY_AUDITOR_JOB_TABLE, table_inventory_auditor_job);
+                + job_id;
 
 
-        String table_name = session.getString(session.KEY_AUDITOR_JOB_TABLE);
+        //customer_master_inventory_table
+        String table_inventory_master = "table_master_costumer" + jobModel.getJob_cust_id();
+
+
+        session.putString(session.KEY_AUDITOR_JOB_TABLE_NAME, table_inventory_auditor_job);
+        session.putString(session.KEY_MASTER_TABLE_NAME, table_inventory_master);
+
+
+        String table_name = session.getString(session.KEY_AUDITOR_JOB_TABLE_NAME);
+        String table_master = session.getString(session.KEY_MASTER_TABLE_NAME);
 
         AppConstant.KEY_INVENTORY_LIST = "ON";
 
@@ -247,12 +276,14 @@ public class JobsFragment extends Fragment implements View.OnClickListener {
         hideShowList();
     }
 
-    public void editInventory(String s, String prd_sku, int prd_quantity, int prd_price) {
+    public void editInventory(String prd_desc, String prd_sku, int prd_quantity, int prd_price) {
 
+        AppConstant.ADD_INVENTORY_STATUS = "edit";
 
-        AppConstant.KEY_SKU = prd_sku;
-        AppConstant.KEY_QUANTITY = prd_quantity;
-        AppConstant.KEY_PRICE = prd_price;
+        AppConstant.KEY_PRD_DESC = prd_desc;
+        AppConstant.KEY_PRD_SKU = prd_sku;
+        AppConstant.KEY_PRD_QUANTITY = prd_quantity;
+        AppConstant.KEY_PRD_PRICE = prd_price;
 
         startActivity(new Intent(getActivity(), InventoryActivity.class));
         getActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
@@ -353,7 +384,7 @@ public class JobsFragment extends Fragment implements View.OnClickListener {
     private void refreshInventoryList() {
 
 
-        String table_name = session.getString(session.KEY_AUDITOR_JOB_TABLE);
+        String table_name = session.getString(session.KEY_AUDITOR_JOB_TABLE_NAME);
 
 
         if (!table_name.isEmpty() || !table_name.equalsIgnoreCase("")) {
@@ -380,5 +411,6 @@ public class JobsFragment extends Fragment implements View.OnClickListener {
         }
 
     }
+
 
 }

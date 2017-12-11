@@ -19,44 +19,56 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.bluechip.inventory.activity.LoginActivity;
+import com.bluechip.inventory.activity.MainActivity;
 
 import org.json.JSONObject;
 
 
 public class VolleyWebservice {
     String WhichWebservice, DialogStr, URL;
-    JSONObject obj;
+    JSONObject object_request;
     Context mContext;
     String TAG = "VolleyWebservice";
     ProgressDialog pDialog;
     LoginActivity loginActivity;
+    MainActivity mainActivity;
 
     Activity activity;
     Handler handler;
     String announcment = "";
 
-   public VolleyWebservice(LoginActivity loginActivity, String WhichWebservice, String DialogStr, String URL, JSONObject obj) {
+    public VolleyWebservice(LoginActivity loginActivity, String WhichWebservice, String DialogStr, String URL, JSONObject object_request) {
         mContext = loginActivity;
         this.WhichWebservice = WhichWebservice;
         this.loginActivity = loginActivity;
         activity = loginActivity;
         this.DialogStr = DialogStr;
         this.URL = URL;
-        this.obj = obj;
+        this.object_request = object_request;
 
         callWebService();
     }
 
-    public VolleyWebservice(Context context, String WhichWebservice, String DialogStr, String URL, JSONObject obj) {
+    public VolleyWebservice(MainActivity mainActivity, String WhichWebservice, String DialogStr, String URL, JSONObject object_request) {
+        mContext = mainActivity;
+        this.mainActivity = mainActivity;
+        this.WhichWebservice = WhichWebservice;
+        this.DialogStr = DialogStr;
+        this.URL = URL;
+        this.object_request = object_request;
+
+        callWebService();
+    }
+
+    public VolleyWebservice(Context context, String WhichWebservice, String DialogStr, String URL, JSONObject object_request) {
         mContext = context;
         this.WhichWebservice = WhichWebservice;
         this.DialogStr = DialogStr;
         this.URL = URL;
-        this.obj = obj;
+        this.object_request = object_request;
 
         callWebService();
     }
-
 
 
     private void callWebService() {
@@ -74,7 +86,7 @@ public class VolleyWebservice {
         }*/
 
 
-        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, URL, obj,
+        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, URL, object_request,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -83,12 +95,12 @@ public class VolleyWebservice {
                             Log.e(TAG, "Service--o/p-" + response);
                             if (WhichWebservice.equals("LoginActivity")) {
                                 loginActivity.getLoginResposeFromVolley(response);
+                            } else if (WhichWebservice.equals("JobFragment")) {
+                                mainActivity.getJobUploadResponseFromVolley(response);
                             }
 
 
-
-
-                         //   pDialog.dismiss();
+                            //   pDialog.dismiss();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -122,7 +134,7 @@ public class VolleyWebservice {
                         ErrorTitle = "Parse Error";
                     }
 
-                 //   pDialog.dismiss();
+                    //   pDialog.dismiss();
                     // AndroidUtils.showNoNetworkConnectionDialog(mContext);
                     if (activity != null) {
 
@@ -135,7 +147,6 @@ public class VolleyWebservice {
 
                     }
                 } catch (Exception e) {
-
 
 
                 }

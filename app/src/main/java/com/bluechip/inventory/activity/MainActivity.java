@@ -24,6 +24,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,15 +33,30 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bluechip.inventory.R;
+import com.bluechip.inventory.database.DatabaseHandler;
+import com.bluechip.inventory.database.InventoryDB;
 import com.bluechip.inventory.fragment.DashboardFragment;
 import com.bluechip.inventory.fragment.JobsFragment;
 import com.bluechip.inventory.fragment.SettingsFragment;
 import com.bluechip.inventory.fragment.ViewReportFragment;
+import com.bluechip.inventory.model.InventoryModel;
+import com.bluechip.inventory.utilities.AppConfig;
 import com.bluechip.inventory.utilities.AppConstant;
+import com.bluechip.inventory.utilities.JsonConstant;
 import com.bluechip.inventory.utilities.SessionManager;
+import com.bluechip.inventory.utilities.Tools;
+import com.bluechip.inventory.utilities.VolleyWebservice;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private String TAG = "MainActivity";
     private NavigationView navigationView;
     private DrawerLayout drawer;
     private View navHeader;
@@ -674,4 +690,118 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
+
+    // upload inventory
+
+
+    public void uploadInventory() {
+
+
+        JSONObject request_object = new JSONObject();
+        JSONObject auditor_detail = new JSONObject();
+        JSONObject job_detail = new JSONObject();
+        JSONArray inventory_detail_array = new JSONArray();
+         List<InventoryModel> inventoryList = new ArrayList<InventoryModel>();
+
+
+        try {
+
+            // auditor
+            auditor_detail.put(JsonConstant.KEY_user_id, session.getString(session.KEY_USER_ID));
+            auditor_detail.put(JsonConstant.KEY_user_email, session.getString(session.KEY_USER_EMAIL));
+
+
+            // job_details
+            job_detail.put(JsonConstant.KEY_job_id, "" + AppConstant.KEY_JOB_ID);
+            job_detail.put(JsonConstant.KEY_job_cust_id, "" + AppConstant.KEY_JOB_CUST_ID);
+            String data = Tools.formattedDatewithTime();
+            job_detail.put(JsonConstant.KEY_job_upload_date, Tools.formattedDatewithTime());
+            job_detail.put(JsonConstant.KEY_job_location_id, "" + AppConstant.KEY_JOB_LOC_ID);
+
+
+            // inventory details for the current job
+
+            String table_name = session.getString(session.KEY_AUDITOR_JOB_TABLE_NAME);
+
+
+            if (!table_name.isEmpty() || !table_name.equalsIgnoreCase("")) {
+
+                InventoryDB inventoryDB = new InventoryDB();
+
+                if (inventoryList != null) {
+                    inventoryList = null;
+                }
+                inventoryList = inventoryDB.getInventoryList(table_name, MainActivity.this);
+
+
+                for (InventoryModel inventoryModel : inventoryList) {
+
+                    JSONObject sub_inventory = new JSONObject();
+
+                    sub_inventory.put(JsonConstant.KEY_prd_id, "" + inventoryModel.getPrd_id());
+                    sub_inventory.put(JsonConstant.KEY_prd_description, "" + inventoryModel.getPrd_desc());
+                    sub_inventory.put(JsonConstant.KEY_prd_sku, "" + inventoryModel.getPrd_sku());
+                    sub_inventory.put(JsonConstant.KEY_prd_price, "" + inventoryModel.getPrd_price());
+                    sub_inventory.put(JsonConstant.KEY_prd_category, "" + inventoryModel.getPrd_category());
+                    sub_inventory.put(JsonConstant.KEY_prd_quantity, "" + inventoryModel.getPrd_quantity());
+
+                    inventory_detail_array.put(sub_inventory);
+
+                }
+
+            }
+
+            // main request
+            request_object.put(JsonConstant.KEY_auditor_details, auditor_detail);
+            request_object.put(JsonConstant.KEY_jobs_details, job_detail);
+            request_object.put(JsonConstant.KEY_inventory_details, inventory_detail_array);
+
+
+            String str1 = "kamlesh";
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        try {
+
+            VolleyWebservice volleyWebservice = new VolleyWebservice( MainActivity.this, "JobFragment", "Please wait", AppConfig.URL_UPLOAD, request_object);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+
+    }
+
+
+    //{"status":"1","msg":"Inventory saved successfully.","data":"0"}
+
+    public void getJobUploadResponseFromVolley(JSONObject response) {
+        Log.e(TAG, "" + response.toString());
+        DatabaseHandler db = new DatabaseHandler(getApplicationContext());
+        try {
+            String status = response.getString("status");
+
+            if (status.equalsIgnoreCase("1")) {
+
+
+                Toast.makeText(getApplicationContext(), "Upload Complete", Toast.LENGTH_SHORT).show();
+
+
+            } else {
+              //  hideStatusDialog();
+                Toast.makeText(getApplicationContext(), "Please try After Sometime", Toast.LENGTH_SHORT).show();
+            }
+        } catch (JSONException e) {
+
+        }
+
+    }
+
 }

@@ -6,6 +6,7 @@ import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
 public class SessionManager {
+
     // LogCat tag
     private static String TAG = SessionManager.class.getSimpleName();
 
@@ -24,8 +25,8 @@ public class SessionManager {
     public static final String KEY_IS_LOGGED_IN = "isLoggedIn";
     public static final String KEY_USER_EMAIL = "userEmail";
     public static final String KEY_USER_ID = "userId";
-    public static final String KEY_AUDITOR_JOB_TABLE = "defaut";
-
+    public static final String KEY_AUDITOR_JOB_TABLE_NAME = "defaut";
+    public static final String KEY_MASTER_TABLE_NAME = "master";
 
     public SessionManager(Context context) {
         this._context = context;

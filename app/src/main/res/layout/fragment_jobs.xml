@@ -76,6 +76,7 @@
                     android:layout_centerHorizontal="true"
                     android:textOff=""
                     android:textOn=""
+                    android:enabled="false"
                     android:thumb="@drawable/switch_selector"
                     android:track="@drawable/switch_custom_track"/>
 

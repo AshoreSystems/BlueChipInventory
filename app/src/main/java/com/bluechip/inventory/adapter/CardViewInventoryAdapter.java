@@ -62,7 +62,7 @@ public class CardViewInventoryAdapter extends
             @Override
             public void onClick(View v) {
 
-                jobsFragment.editInventory(""+inventoryList.get(pos).getPrd_id(),
+                jobsFragment.editInventory(""+inventoryList.get(pos).getPrd_desc(),
                         inventoryList.get(pos).getPrd_sku(),
                         inventoryList.get(pos).getPrd_quantity(),
                         inventoryList.get(pos).getPrd_price());

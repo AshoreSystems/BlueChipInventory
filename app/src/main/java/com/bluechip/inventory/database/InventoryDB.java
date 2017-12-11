@@ -18,8 +18,6 @@ import java.util.List;
 
 public class InventoryDB {
 
-    String TABLE_NAME_INVENTORY;
-
 
     /////////////////////////////////////////////////////////////
     /////////////////// Customer Details ////////////////////////
@@ -43,7 +41,7 @@ public class InventoryDB {
             // Insert Row
             db.insert(DatabaseHandler.TABLE_CUSTOMER_DETAILS, null, values);
 
-            int check_insert = getCustomerCount( db, customer.getCustomer_id());
+            int check_insert = getCustomerCount(db, customer.getCustomer_id());
 
             db.close(); // Closing database connection
         } else {
@@ -80,9 +78,8 @@ public class InventoryDB {
     /////////////////////////////////////////////////////////////
 
     // add inventory in master
-    public void addMasterInventory(String table_name, MasterInventoryModel inventory, Context context) {
+    public void addMasterInventory(String TABLE_NAME_MASTER, MasterInventoryModel inventory, Context context) {
 
-        this.TABLE_NAME_INVENTORY = table_name;
 
         DatabaseHandler DH = new DatabaseHandler(context);
         SQLiteDatabase db = DH.OpenWritable();
@@ -99,11 +96,12 @@ public class InventoryDB {
         values.put(DatabaseHandler.KEY_MASTER_PRD_DESCRIPTION, inventory.getPrd_desc());
         values.put(DatabaseHandler.KEY_MASTER_PRD_PRICE, inventory.getPrd_price());
 
+        int price = inventory.getPrd_price();
 
         // Insert Row
-        db.insert(TABLE_NAME_INVENTORY, null, values);
+        db.insert(TABLE_NAME_MASTER, null, values);
 
-        int check_insert = getMasterCount(TABLE_NAME_INVENTORY, db, inventory.getPrd_id());
+        int check_insert = getMasterCount(TABLE_NAME_MASTER, db, inventory.getPrd_id());
 
         db.close(); // Closing database connection
 
@@ -112,12 +110,12 @@ public class InventoryDB {
 
 
     //Get Total Count of Que for a Event
-    public int getMasterCount(String TABLE_NAME_INVENTORY, SQLiteDatabase db, int  product_id) {
+    public int getMasterCount(String TABLE_NAME_MASTER, SQLiteDatabase db, int product_id) {
 
 
-        String countQuery = "SELECT * FROM " + TABLE_NAME_INVENTORY
+        String countQuery = "SELECT * FROM " + TABLE_NAME_MASTER
                 + " WHERE "
-                + DatabaseHandler.KEY_PRD_SKU + " ='" + product_id + "';";
+                + DatabaseHandler.KEY_PRD_ID + " ='" + product_id + "';";
 
         Cursor cursor = db.rawQuery(countQuery, null);
         int count = cursor.getCount();
@@ -131,15 +129,15 @@ public class InventoryDB {
     }
 
     // Master inventory details
-    public InventoryModel getMasterInventoryDetails(String TABLE_NAME_INVENTORY, Context context, String product_id) {
+    public MasterInventoryModel getMasterInventoryDetails(String TABLE_NAME_MASTER, Context context, String product_sku) {
 
-        InventoryModel inventory = new InventoryModel();
+        MasterInventoryModel inventory = new MasterInventoryModel();
         DatabaseHandler DH = new DatabaseHandler(context);
         SQLiteDatabase db = DH.OpenWritable();
 
-        String detailsQuery = "SELECT * FROM " + TABLE_NAME_INVENTORY
+        String detailsQuery = "SELECT * FROM " + TABLE_NAME_MASTER
                 + " WHERE "
-                + DatabaseHandler.KEY_PRD_ID + " ='" + product_id + "' ;";
+                + DatabaseHandler.KEY_MASTER_PRD_SKU + " ='" + product_sku + "' ;";
 
         Cursor cursor = db.rawQuery(detailsQuery, null);
 
@@ -166,7 +164,7 @@ public class InventoryDB {
         DatabaseHandler DH = new DatabaseHandler(context);
         SQLiteDatabase db = DH.OpenWritable();
 
-        String detailsQuery = "SELECT * FROM " + TABLE_NAME_MASTER+ " ;";
+        String detailsQuery = "SELECT * FROM " + TABLE_NAME_MASTER + " ;";
 
         Cursor cursor = db.rawQuery(detailsQuery, null);
 
@@ -196,20 +194,17 @@ public class InventoryDB {
     /////////////////////////////////////////////////////////
 
 
-    public void addInventory(String table_name, InventoryModel inventory, Context context) {
+    public void addInventory(String TABLE_NAME_INVENTORY, InventoryModel inventory, Context context) {
 
-        this.TABLE_NAME_INVENTORY = table_name;
 
         DatabaseHandler DH = new DatabaseHandler(context);
         SQLiteDatabase db = DH.OpenWritable();
 
 
-        String  id = inventory.getPrd_sku();
+        String id = inventory.getPrd_sku();
         ContentValues values = new ContentValues();
 
         if (getInventoryCount(TABLE_NAME_INVENTORY, db, id) < 1) {
-
-
 
 
             values.put(DatabaseHandler.KEY_PRD_ID, inventory.getPrd_id());
@@ -227,8 +222,6 @@ public class InventoryDB {
 
             db.close(); // Closing database connection
         } else {
-
-
 
 
             values.put(DatabaseHandler.KEY_PRD_ID, inventory.getPrd_id());
@@ -250,7 +243,7 @@ public class InventoryDB {
     }
 
     //Get Total Count of Que for a Event
-    public int getInventoryCount(String TABLE_NAME_INVENTORY, SQLiteDatabase db, String  product_id) {
+    public int getInventoryCount(String TABLE_NAME_INVENTORY, SQLiteDatabase db, String product_id) {
 
 
         String countQuery = "SELECT * FROM " + TABLE_NAME_INVENTORY
@@ -300,12 +293,17 @@ public class InventoryDB {
     // display inventory for job
     public List<InventoryModel> getInventoryList(String TABLE_NAME_INVENTORY, Context context) {
 
-        List<InventoryModel> inventoryList = new ArrayList<InventoryModel>();;
+        List<InventoryModel> inventoryList = new ArrayList<InventoryModel>();
+        ;
 
         DatabaseHandler DH = new DatabaseHandler(context);
         SQLiteDatabase db = DH.OpenWritable();
 
-        String detailsQuery = "SELECT * FROM " + TABLE_NAME_INVENTORY + " ;";
+        String detailsQuery = "SELECT * FROM " + TABLE_NAME_INVENTORY
+                + " ORDER BY "
+                + DatabaseHandler.KEY_PRD_DESCRIPTION
+                + " COLLATE NOCASE ASC "
+                + " ;";
 
         Cursor cursor = db.rawQuery(detailsQuery, null);
 

@@ -111,13 +111,13 @@ public class JobsDB {
     }
 
 
-    public JobModel getJobDetails(Context context, String job_id) {
+    public JobModel getJobDetails(Context context, int job_id) {
 
         JobModel jobModel = new JobModel();
         DatabaseHandler DH = new DatabaseHandler(context);
         SQLiteDatabase db = DH.OpenWritable();
 
-        String detailsQuery = "SELECT * FROM" + DatabaseHandler.TABLE_JOBS_DETAILS
+        String detailsQuery = "SELECT * FROM " + DatabaseHandler.TABLE_JOBS_DETAILS
                 + " WHERE "
                 + DatabaseHandler.KEY_JOB_ID + " ='" + job_id + "' ;";
 

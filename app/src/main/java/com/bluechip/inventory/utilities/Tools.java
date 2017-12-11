@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.util.DisplayMetrics;
 import android.view.inputmethod.InputMethodManager;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -87,5 +89,14 @@ public class Tools {
 		return app_installed;
 	}
 
+
+	public static String formattedDatewithTime()
+	{
+		String formattedDatewithTime;
+		Calendar c = Calendar.getInstance();
+		SimpleDateFormat dfwithtime = new SimpleDateFormat("yyyy-dd-MM");
+		formattedDatewithTime=dfwithtime.format(c.getTime());
+		return formattedDatewithTime;
+	}
 
 }

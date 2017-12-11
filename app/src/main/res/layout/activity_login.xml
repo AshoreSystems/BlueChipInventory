@@ -128,9 +128,10 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:background="@color/white"
-        android:visibility="gone"
+        android:visibility="invisible"
         android:padding="@dimen/login_page_padding">
         <LinearLayout
+            android:background="@color/white"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -160,7 +161,6 @@
                 <AutoCompleteTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/prompt_email"
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:drawableRight="@drawable/icons_user"
@@ -181,7 +181,6 @@
                     android:drawableRight="@drawable/icons_lock"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/prompt_password"
                     android:imeActionId="@+id/login"
                     android:imeOptions="actionUnspecified"
                     android:inputType="textPassword"
@@ -200,7 +199,8 @@
                 android:background="@color/color_app_blue"
                 android:textStyle="bold"/>
 
-            <Button android:visibility="invisible"
+            <Button
+                android:visibility="invisible"
                 android:layout_gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="20dp"

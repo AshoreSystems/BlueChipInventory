@@ -33,6 +33,7 @@ import android.widget.Toast;
 import com.bluechip.inventory.R;
 import com.bluechip.inventory.database.InventoryDB;
 import com.bluechip.inventory.model.InventoryModel;
+import com.bluechip.inventory.model.MasterInventoryModel;
 import com.bluechip.inventory.utilities.AppConstant;
 import com.bluechip.inventory.utilities.ConnectionDetector;
 import com.bluechip.inventory.utilities.CustomDialog;
@@ -67,6 +68,10 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
     private static final int REQUEST_PERMISSION_SETTING = 101;
     private boolean sentToSettings = false;
     private SessionManager session;
+
+    // inventory details
+    MasterInventoryModel masterInventoryModel;
+    InventoryDB inventoryDB;
 
 
     @Override
@@ -128,8 +133,6 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
         button_save.setOnClickListener(this);
 
 
-
-
         editText_sku.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -151,11 +154,23 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
 
         resetForm();
 
-        editText_sku_test.setText(""+AppConstant.KEY_SKU);
-        editText_quantity.setText(""+AppConstant.KEY_QUANTITY);
-        editText_price.setText(""+AppConstant.KEY_PRICE);
+        editText_price.setText("");
 
+        if (AppConstant.ADD_INVENTORY_STATUS.equalsIgnoreCase("edit")) {
 
+            editText_desc.setText("" + AppConstant.KEY_PRD_DESC);
+            editText_sku_test.setText("" + AppConstant.KEY_PRD_SKU);
+            editText_quantity.setText("" + AppConstant.KEY_PRD_QUANTITY);
+            editText_price.setText("" + AppConstant.KEY_PRD_PRICE);
+
+        } /*else {
+
+            // new inventory
+        }
+*/
+        // inventory details
+        masterInventoryModel = new MasterInventoryModel();
+        inventoryDB = new InventoryDB();
 
     }
 
@@ -165,7 +180,7 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
         if (editText_sku.getText().toString().equalsIgnoreCase("")) {
 
         } else {
-            Toast.makeText(getApplicationContext(), "" + editText_sku.getText().toString().replaceAll("\\s", ""), Toast.LENGTH_SHORT).show();
+            //  Toast.makeText(getApplicationContext(), "" + editText_sku.getText().toString().replaceAll("\\s", ""), Toast.LENGTH_SHORT).show();
 
             openNewInventoryForm();
         }
@@ -181,7 +196,7 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
         int quantity = 0;
 
 
-        editText_price.setText("");
+        String temp = "" + editText_sku.getText().toString().replaceAll("\\s", "");
 
 
         if ((editText_sku_test.getText().toString()).equalsIgnoreCase(editText_sku.getText().toString().replaceAll("\\s", ""))) {
@@ -208,6 +223,7 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
             }
         } else {
 
+            AppConstant.ADD_INVENTORY_STATUS = "new";
 
             if (AppConstant.KEY_ONE_AT) {
                 quantity = quantity + 1;
@@ -223,7 +239,27 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
         editText_sku_test.setText(editText_sku.getText().toString().replaceAll("\\s", ""));
         String str = editText_sku.getText().toString().replaceAll("\\s", "");
 
-        editText_desc.setText((editText_sku.getText().toString()).replaceAll("\\s", ""));
+        //editText_desc.setText((editText_sku.getText().toString()).replaceAll("\\s", ""));
+
+        // get inventory details from master
+        if (AppConstant.ADD_INVENTORY_STATUS.equalsIgnoreCase("new")) {
+
+            String str_sku = editText_sku_test.getText().toString();
+            String table_master = session.getString(session.KEY_MASTER_TABLE_NAME);
+
+
+            try {
+                masterInventoryModel = inventoryDB.getMasterInventoryDetails(table_master, InventoryActivity.this, str_sku);
+                editText_price.setText("" + masterInventoryModel.getPrd_price());
+                editText_desc.setText("" + masterInventoryModel.getPrd_desc());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+            String temp1 = "kamlesh";
+        }
+
 
         if (!AppConstant.KEY_ONE_AT) {
 
@@ -237,7 +273,7 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
                 new CustomDialog().dialog_enable_internet(InventoryActivity.this, " Please enable Internet for working of \"Voice to Text\" ");
             }
 
-        }else{
+        } else {
 
             saveInventoryToDB();
 
@@ -250,16 +286,16 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
 
     private void saveInventoryToDB() {
 
-        String table_name= session.getString(session.KEY_AUDITOR_JOB_TABLE);
+        String table_name = session.getString(session.KEY_AUDITOR_JOB_TABLE_NAME);
 
         InventoryModel inventoryModel = new InventoryModel();
         inventoryModel.setPrd_sku(editText_sku_test.getText().toString());
 
-        if(editText_price.getText().toString().equalsIgnoreCase("")||editText_price.getText().toString().isEmpty()){
+        if (editText_price.getText().toString().equalsIgnoreCase("") || editText_price.getText().toString().isEmpty()) {
 
-            inventoryModel.setPrd_price(100);
-        }else{
-            inventoryModel.setPrd_price(100+Integer.parseInt(editText_price.getText().toString()));
+            inventoryModel.setPrd_price(0);
+        } else {
+            inventoryModel.setPrd_price(Integer.parseInt(editText_price.getText().toString()));
         }
 
         inventoryModel.setPrd_quantity(Integer.parseInt(editText_quantity.getText().toString()));
@@ -268,10 +304,12 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
         try {
             InventoryDB inventoryDB = new InventoryDB();
             inventoryDB.addInventory(table_name, inventoryModel, InventoryActivity.this);
-        }catch (Exception e){
+
+            Toast.makeText(getApplicationContext(), "Saved Successfully", Toast.LENGTH_SHORT).show();
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
 
 
     }
@@ -306,8 +344,18 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
 
             case R.id.button_save:
 
-                saveInventoryToDB();
-               // resetForm();
+                if (editText_sku_test.getText().toString().isEmpty() || editText_sku_test.getText().toString().equalsIgnoreCase("")) {
+
+
+                     Toast.makeText(getApplicationContext(), "Please Scan the SKU", Toast.LENGTH_SHORT).show();
+
+                }else{
+
+                    saveInventoryToDB();
+                }
+
+
+                // resetForm();
 
                 break;
 

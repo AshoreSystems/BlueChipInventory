@@ -177,45 +177,9 @@ public class LoginActivity extends Activity {
         //      showStatusDialog();
         login_progress.setVisibility(View.VISIBLE);
 
-        JSONObject json = new JSONObject();
-        JSONObject sub_json = new JSONObject();
-        JSONArray array = new JSONArray();
-
-/*
-        for (String string : new String[]{"12", "23", "1", "2"}) {
-            array.put(string);
-        }
-*/
 
 
-        try {
-
-
-            json.put("event_id", "7");
-            json.put("cust_ques_ans", sub_json);
-
-
-            for (int i = 0; i < 10; i++) {
-
-                sub_json.put("prd_id", "121" + i);
-                sub_json.put("prd_desc", "description" + i);
-                sub_json.put("prd_price", "10" + i);
-
-                array.put(sub_json);
-
-
-            }
-
-            json.put("inventory_array", array);
-            json.put("contact_no", "1235");
-
-            String str = "kamlesh";
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-
-        JSONObject obj = null;
+       JSONObject obj = null;
         obj = new JSONObject();
         try {
             obj.put("user_email", email);
@@ -223,12 +187,14 @@ public class LoginActivity extends Activity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-                /*			VolleyWebservice volleyWebservice = new VolleyWebservice(LoginActivity.this, "LoginActivity", "Please wait", "http://192.168.1.90/pillowsuggestor/api_1_0/sync_retailer", obj);
+
+        /*VolleyWebservice volleyWebservice = new VolleyWebservice(LoginActivity.this, "LoginActivity", "Please wait", "http://192.168.1.90/pillowsuggestor/api_1_0/sync_retailer", obj);
             */
         VolleyWebservice volleyWebservice = new VolleyWebservice(LoginActivity.this, "LoginActivity", "Please wait", AppConfig.URL_LOGIN, obj);
         //volleyWebservice.callWebService();
 
     }
+
 
 
     private void showStatusDialog() {
@@ -509,6 +475,8 @@ public class LoginActivity extends Activity {
                         JSONArray jsonArray = jsonObject.getJSONArray("inventory_data");
                         String table_master = "table_master_costumer" + jsonObject.getInt("cust_id");
 
+                        // remove indexing if exist----------------
+
                         // create dynamic master table -- table_master_costumer_cust_id
 
                         try {
@@ -535,14 +503,17 @@ public class LoginActivity extends Activity {
                         // customer master inventory ------------------------------------------------
                         for (int j = 0; j < jsonArray.length(); j++) {
 
-                            JSONObject jsonObject1 = jsonArray.getJSONObject(i);
+                            JSONObject jsonObject1 = jsonArray.getJSONObject(j);
 
                             MasterInventoryModel masterInventory = new MasterInventoryModel();
-                            masterInventory.setPrd_id(jsonObject1.getInt("prd_id"));
+
+
+                            masterInventory.setPrd_id( jsonObject1.getInt("prd_id"));
                             masterInventory.setPrd_category(jsonObject1.getString("prd_category"));
                             masterInventory.setPrd_sku(jsonObject1.getString("prd_SKU"));
                             masterInventory.setPrd_desc(jsonObject1.getString("prd_description"));
-                            masterInventory.setPrd_price(jsonObject1.getInt("prd_price"));
+
+                            masterInventory.setPrd_price((int) (Float.parseFloat(jsonObject1.getString("prd_price"))*100));
 
                             inventoryDB.addMasterInventory(table_master, masterInventory, context);
 
@@ -557,6 +528,8 @@ public class LoginActivity extends Activity {
                             }
                             Log.e("STATUS ", "" + CURRENT_PROGRESS);
                         }
+
+                        // add indexing if not exist----------------
                     }
                     //  check Master List
                     InventoryDB inventoryDBchk = new InventoryDB();
@@ -603,5 +576,6 @@ public class LoginActivity extends Activity {
 
 
     }
+
 
 }
