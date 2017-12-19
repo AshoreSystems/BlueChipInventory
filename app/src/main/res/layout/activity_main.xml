@@ -20,8 +20,8 @@
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/activity_main_drawer"
-        app:itemTextAppearance="?android:attr/textAppearanceLarge"
-        android:minHeight="?android:attr/listPreferredItemHeightLarge"
+        app:itemTextAppearance="?android:attr/textAppearance"
+        android:minHeight="?android:attr/listPreferredItemHeight"
 
 
 

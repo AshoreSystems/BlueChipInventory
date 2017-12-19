@@ -4,6 +4,8 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.FragmentManager;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -42,6 +44,8 @@ import com.bluechip.inventory.fragment.ViewReportFragment;
 import com.bluechip.inventory.model.InventoryModel;
 import com.bluechip.inventory.utilities.AppConfig;
 import com.bluechip.inventory.utilities.AppConstant;
+import com.bluechip.inventory.utilities.ConnectionDetector;
+import com.bluechip.inventory.utilities.CustomDialog;
 import com.bluechip.inventory.utilities.JsonConstant;
 import com.bluechip.inventory.utilities.SessionManager;
 import com.bluechip.inventory.utilities.Tools;
@@ -61,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawer;
     private View navHeader;
     private ImageView imgNavHeaderBg, imgProfile;
-    private TextView txtName, txtWebsite;
+    private TextView txtName, txtemail;
     private Toolbar toolbar;
     private FloatingActionButton fab;
 
@@ -104,6 +108,16 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_PERMISSION_SETTING = 101;
     private boolean sentToSettings = false;
 
+
+    // progress
+    private ProgressDialog progressDialog_status, progressLoading;
+    public Handler progressBarHandler1 = new Handler();
+    public static Thread mThread;
+    private static int MAX_UPLOAD = 0;
+    private static int CURRENT_PROGRESS = 0;
+    Context context = null;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,8 +135,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Navigation view header
         navHeader = navigationView.getHeaderView(0);
-        txtName = (TextView) navHeader.findViewById(R.id.user_name);
-        txtWebsite = (TextView) navHeader.findViewById(R.id.website);
+        txtName = (TextView) navHeader.findViewById(R.id.textview_user_name);
+        txtemail = (TextView) navHeader.findViewById(R.id.textview_user_email);
         imgNavHeaderBg = (ImageView) navHeader.findViewById(R.id.img_header_bg);
         imgProfile = (ImageView) navHeader.findViewById(R.id.img_profile);
 
@@ -162,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
         // name, website
         txtName.setText("User name");
         txtName.setVisibility(View.INVISIBLE);
-        txtWebsite.setText(session.getString(session.KEY_USER_ID).toString());
+        txtemail.setText(session.getString(session.KEY_USER_EMAIL).toString());
 
         imgProfile.setImageResource(R.drawable.bluechip_log);
 
@@ -510,7 +524,6 @@ public class MainActivity extends AppCompatActivity {
         finish();
 
 
-
     }
 
     @Override
@@ -536,6 +549,19 @@ public class MainActivity extends AppCompatActivity {
             if (AppConstant.KEY_INVENTORY_LIST.equalsIgnoreCase("ON")) {
                 AppConstant.KEY_INVENTORY_LIST = "OFF";
                 jobsFragment.hideShowList();
+            } else {
+                // return to DashBoard
+                loadDashBoardFragment();
+            }
+
+
+            setToolbarTitle();
+        } else if (CURRENT_TAG.equalsIgnoreCase(TAG_VIEW_REPORT)) {
+
+
+            if (AppConstant.KEY_INVENTORY_LIST.equalsIgnoreCase("ON")) {
+                AppConstant.KEY_INVENTORY_LIST = "OFF";
+                viewReportFragment.hideShowList();
             } else {
                 // return to DashBoard
                 loadDashBoardFragment();
@@ -617,11 +643,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
     private void requestPermissionDialog() {
 
-        permissionStatus = getSharedPreferences("permissionStatus",MODE_PRIVATE);
+        permissionStatus = getSharedPreferences("permissionStatus", MODE_PRIVATE);
 
 
         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -648,7 +672,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
                 builder.show();
-            } else if (permissionStatus.getBoolean(Manifest.permission.RECORD_AUDIO,false)) {
+            } else if (permissionStatus.getBoolean(Manifest.permission.RECORD_AUDIO, false)) {
                 //Previously Permission Request was cancelled with 'Dont Ask Again',
                 // Redirect to Settings after showing Information about why you need the permission
 
@@ -684,7 +708,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             SharedPreferences.Editor editor = permissionStatus.edit();
-            editor.putBoolean(Manifest.permission.RECORD_AUDIO,true);
+            editor.putBoolean(Manifest.permission.RECORD_AUDIO, true);
             editor.commit();
 
 
@@ -698,82 +722,180 @@ public class MainActivity extends AppCompatActivity {
     public void uploadInventory() {
 
 
-        JSONObject request_object = new JSONObject();
-        JSONObject auditor_detail = new JSONObject();
-        JSONObject job_detail = new JSONObject();
-        JSONArray inventory_detail_array = new JSONArray();
-         List<InventoryModel> inventoryList = new ArrayList<InventoryModel>();
+        if (isInternetOn()) {
+
+            final JSONObject request_object = new JSONObject();
+            final JSONObject auditor_detail = new JSONObject();
+            final JSONObject job_detail = new JSONObject();
+            final JSONArray inventory_detail_array = new JSONArray();
 
 
-        try {
+            // total length
+            CURRENT_PROGRESS = 0;
+            MAX_UPLOAD = 0;
+            this.context = getApplicationContext();
+            //  session = new SessionManager(context);
 
-            // auditor
-            auditor_detail.put(JsonConstant.KEY_user_id, session.getString(session.KEY_USER_ID));
-            auditor_detail.put(JsonConstant.KEY_user_email, session.getString(session.KEY_USER_EMAIL));
-
-
-            // job_details
-            job_detail.put(JsonConstant.KEY_job_id, "" + AppConstant.KEY_JOB_ID);
-            job_detail.put(JsonConstant.KEY_job_cust_id, "" + AppConstant.KEY_JOB_CUST_ID);
-            String data = Tools.formattedDatewithTime();
-            job_detail.put(JsonConstant.KEY_job_upload_date, Tools.formattedDatewithTime());
-            job_detail.put(JsonConstant.KEY_job_location_id, "" + AppConstant.KEY_JOB_LOC_ID);
-
-
-            // inventory details for the current job
-
-            String table_name = session.getString(session.KEY_AUDITOR_JOB_TABLE_NAME);
+            progressDialog_status = new ProgressDialog(MainActivity.this);
+            progressDialog_status.setCancelable(false);
+            //progressDialog_status.setTitle("Please Wait");
+            progressDialog_status.setMessage("Uploading Inventories..");
+            progressDialog_status.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            // progressDialog_status.setProgressNumberFormat(null);
+            progressDialog_status.setProgress(0);
 
 
-            if (!table_name.isEmpty() || !table_name.equalsIgnoreCase("")) {
+            try {
+                // auditor
+                auditor_detail.put(JsonConstant.KEY_user_id, session.getString(session.KEY_USER_ID));
+                auditor_detail.put(JsonConstant.KEY_user_email, session.getString(session.KEY_USER_EMAIL));
 
-                InventoryDB inventoryDB = new InventoryDB();
+                // job_details
+                job_detail.put(JsonConstant.KEY_job_id, "" + AppConstant.KEY_JOB_ID);
+                job_detail.put(JsonConstant.KEY_job_cust_id, "" + AppConstant.KEY_JOB_CUST_ID);
+                String data = Tools.formattedDatewithTime();
+                job_detail.put(JsonConstant.KEY_job_upload_date, Tools.formattedDatewithTime());
+                job_detail.put(JsonConstant.KEY_job_location_id, "" + AppConstant.KEY_JOB_LOC_ID);
 
-                if (inventoryList != null) {
-                    inventoryList = null;
+                // inventory details for the current job
+                final String table_name = session.getString(session.KEY_AUDITOR_JOB_TABLE_NAME);
+
+                if (!table_name.isEmpty() || !table_name.equalsIgnoreCase("")) {
+
+                    // total inventory
+                    InventoryDB inventoryDB = new InventoryDB();
+                    MAX_UPLOAD = inventoryDB.getTotalInventoryCount(table_name, MainActivity.this);
+                    MAX_UPLOAD = MAX_UPLOAD+MAX_UPLOAD;
+                    progressDialog_status.setMax(MAX_UPLOAD);
+
+                    if (MAX_UPLOAD == 0) {
+                    } else {
+                        showStatusDialog();
+                    }
+
+                    if (mThread != null) {
+                        mThread = null;
+                    }
+
+                    mThread = new Thread() {
+                        public void run() {
+                            progressBarHandler1
+                                    .post(new Runnable() {
+                                        public void run() {
+                                            progressDialog_status.setProgress(CURRENT_PROGRESS);
+                                        }
+                                    });
+
+                            try {
+                                List<InventoryModel> inventoryList = new ArrayList<InventoryModel>();
+                                InventoryDB inventoryDB = new InventoryDB();
+                                inventoryList = inventoryDB.getInventoryList(table_name, MainActivity.this);
+
+                                for (InventoryModel inventoryModel : inventoryList) {
+
+                                    JSONObject sub_inventory = new JSONObject();
+
+                                    sub_inventory.put(JsonConstant.KEY_prd_id, "" + inventoryModel.getPrd_id());
+                                    sub_inventory.put(JsonConstant.KEY_prd_description, "" + inventoryModel.getPrd_desc());
+                                    sub_inventory.put(JsonConstant.KEY_prd_sku, "" + inventoryModel.getPrd_sku());
+                                    sub_inventory.put(JsonConstant.KEY_prd_price, "" + inventoryModel.getPrd_price());
+                                    sub_inventory.put(JsonConstant.KEY_prd_category, "" + inventoryModel.getPrd_category());
+                                    sub_inventory.put(JsonConstant.KEY_prd_quantity, "" + inventoryModel.getPrd_quantity());
+
+                                    inventory_detail_array.put(sub_inventory);
+
+
+                                    CURRENT_PROGRESS++;
+                                    try {
+                                        Thread.sleep(100);
+                                        progressDialog_status.setProgress(CURRENT_PROGRESS);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    Log.e("STATUS ", "" + CURRENT_PROGRESS);
+                                } for (InventoryModel inventoryModel : inventoryList) {
+
+                                    JSONObject sub_inventory = new JSONObject();
+
+                                    sub_inventory.put(JsonConstant.KEY_prd_id, "" + inventoryModel.getPrd_id());
+                                    sub_inventory.put(JsonConstant.KEY_prd_description, "" + inventoryModel.getPrd_desc());
+                                    sub_inventory.put(JsonConstant.KEY_prd_sku, "" + inventoryModel.getPrd_sku());
+                                    sub_inventory.put(JsonConstant.KEY_prd_price, "" + inventoryModel.getPrd_price());
+                                    sub_inventory.put(JsonConstant.KEY_prd_category, "" + inventoryModel.getPrd_category());
+                                    sub_inventory.put(JsonConstant.KEY_prd_quantity, "" + inventoryModel.getPrd_quantity());
+
+                                    inventory_detail_array.put(sub_inventory);
+
+                                    CURRENT_PROGRESS++;
+                                    try {
+                                        Thread.sleep(100);
+                                        progressDialog_status.setProgress(CURRENT_PROGRESS);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    Log.e("STATUS ", "" + CURRENT_PROGRESS);
+                                }
+                                // main request
+                                request_object.put(JsonConstant.KEY_auditor_details, auditor_detail);
+                                request_object.put(JsonConstant.KEY_jobs_details, job_detail);
+                                request_object.put(JsonConstant.KEY_inventory_details, inventory_detail_array);
+
+                                // completed
+                                progressBarHandler1
+                                        .post(new Runnable() {
+                                            public void run() {
+                                                if (CURRENT_PROGRESS == MAX_UPLOAD) {
+                                                    progressDialog_status.setTitle("Done");
+
+                                                    try {
+                                                        Thread.sleep(1000);
+                                                    } catch (InterruptedException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                                try {
+                                                    hideStatusDialog();
+
+                                                    openLoadingProgress();
+
+
+                                                        VolleyWebservice volleyWebservice = new VolleyWebservice( MainActivity.this, "JobFragment", "Please wait", AppConfig.URL_UPLOAD, request_object);
+
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+
+
+                                        });
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+                    mThread.start();
+                } else {
+                    //no inventories to upload for the current job
+                    new CustomDialog().dialog_ok_button(MainActivity.this, getResources().getString(R.string.msg_enable_internet));
+
                 }
-                inventoryList = inventoryDB.getInventoryList(table_name, MainActivity.this);
 
 
-                for (InventoryModel inventoryModel : inventoryList) {
+                String str1 = "kamlesh";
 
-                    JSONObject sub_inventory = new JSONObject();
 
-                    sub_inventory.put(JsonConstant.KEY_prd_id, "" + inventoryModel.getPrd_id());
-                    sub_inventory.put(JsonConstant.KEY_prd_description, "" + inventoryModel.getPrd_desc());
-                    sub_inventory.put(JsonConstant.KEY_prd_sku, "" + inventoryModel.getPrd_sku());
-                    sub_inventory.put(JsonConstant.KEY_prd_price, "" + inventoryModel.getPrd_price());
-                    sub_inventory.put(JsonConstant.KEY_prd_category, "" + inventoryModel.getPrd_category());
-                    sub_inventory.put(JsonConstant.KEY_prd_quantity, "" + inventoryModel.getPrd_quantity());
-
-                    inventory_detail_array.put(sub_inventory);
-
-                }
-
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
-            // main request
-            request_object.put(JsonConstant.KEY_auditor_details, auditor_detail);
-            request_object.put(JsonConstant.KEY_jobs_details, job_detail);
-            request_object.put(JsonConstant.KEY_inventory_details, inventory_detail_array);
 
 
-            String str1 = "kamlesh";
 
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-        try {
-
-            VolleyWebservice volleyWebservice = new VolleyWebservice( MainActivity.this, "JobFragment", "Please wait", AppConfig.URL_UPLOAD, request_object);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        } else {
+            new CustomDialog().dialog_ok_button(MainActivity.this, getResources().getString(R.string.msg_enable_internet));
 
         }
 
@@ -795,12 +917,50 @@ public class MainActivity extends AppCompatActivity {
 
 
             } else {
-              //  hideStatusDialog();
+                //  hideStatusDialog();
                 Toast.makeText(getApplicationContext(), "Please try After Sometime", Toast.LENGTH_SHORT).show();
+            }
+            if (progressLoading.isShowing()) {
+                progressLoading.dismiss();
             }
         } catch (JSONException e) {
 
         }
+
+    }
+
+    private void showStatusDialog() {
+        if (!progressDialog_status.isShowing())
+            progressDialog_status.show();
+    }
+
+    private void hideStatusDialog() {
+        if (progressDialog_status.isShowing())
+            progressDialog_status.dismiss();
+    }
+
+
+    private void openLoadingProgress() {
+
+
+        progressLoading = new ProgressDialog(MainActivity.this);
+        progressLoading.setCancelable(false);
+        //progressDialog_status.setTitle("Please Wait");
+        progressLoading.setMessage("Please wait..");
+        progressLoading.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        // progressDialog_status.setProgressNumberFormat(null);
+
+        progressLoading.show();
+
+
+    }
+
+
+    // internet
+    public boolean isInternetOn() {
+        ConnectionDetector connectionDetector = new ConnectionDetector(this);
+        //isInternetPresent = connectionDetector.isConnectingToInternet();
+        return connectionDetector.haveNetworkConnection();
 
     }
 

@@ -95,7 +95,9 @@ public class VolleyWebservice {
                             Log.e(TAG, "Service--o/p-" + response);
                             if (WhichWebservice.equals("LoginActivity")) {
                                 loginActivity.getLoginResposeFromVolley(response);
-                            } else if (WhichWebservice.equals("JobFragment")) {
+                            } else if (WhichWebservice.equals("ForgetPassword")) {
+                                loginActivity.getForgetPasswordResposeFromVolley(response);
+                            }else if (WhichWebservice.equals("JobFragment")) {
                                 mainActivity.getJobUploadResponseFromVolley(response);
                             }
 

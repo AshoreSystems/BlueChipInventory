@@ -49,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:text="Facilty Name"
                 android:textColor="@color/color_app_blue"
-                android:textSize="@dimen/text_job_title"
+                android:textSize="@dimen/text_job_details"
                 />
 
         </LinearLayout>

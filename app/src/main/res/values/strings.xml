@@ -37,6 +37,7 @@
     <string name="inventory">Add Inventory</string>
     <string name="login">LOGIN</string>
     <string name="forgot_pwd">FORGOT PASSWORD?</string>
+    <string name="send_pwd">Reset PASSWORD</string>
     <string name="prompt_password">password</string>
     <string name="prompt_email">email</string>
     <string name="company_name">Blue Chip Inventory</string>
@@ -81,7 +82,8 @@
     <string name="speech_prompt">Say Something</string>
     <string name="speech_not_supported">Device Do not Support</string>
     <string name="login_id">john.dev@gmail.com</string>
-    <string name="login_pwd">123456</string>
+    <string name="login_pwd">12345</string>
+    <string name="msg_enable_internet">Please enable  internet . .</string>
 
 
 </resources>

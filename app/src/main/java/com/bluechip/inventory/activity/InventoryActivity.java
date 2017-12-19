@@ -113,13 +113,11 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
 
     private void initializeView() {
 
-
         session = new SessionManager(InventoryActivity.this);
 
         editText_sku = (EditText) findViewById(R.id.editText_sku);
         editText_sku_test = (EditText) findViewById(R.id.editText_sku_test);
         editText_sku_test.setFocusable(false);
-
 
         editText_price = (EditText) findViewById(R.id.editText_price);
         editText_quantity = (EditText) findViewById(R.id.editText_quantity);
@@ -136,33 +134,26 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
         editText_sku.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-
                 saveInventory();
-
             }
         });
 
         resetForm();
-
         editText_price.setText("");
 
         if (AppConstant.ADD_INVENTORY_STATUS.equalsIgnoreCase("edit")) {
-
             editText_desc.setText("" + AppConstant.KEY_PRD_DESC);
             editText_sku_test.setText("" + AppConstant.KEY_PRD_SKU);
             editText_quantity.setText("" + AppConstant.KEY_PRD_QUANTITY);
             editText_price.setText("" + AppConstant.KEY_PRD_PRICE);
-
         } /*else {
 
             // new inventory
@@ -171,45 +162,30 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
         // inventory details
         masterInventoryModel = new MasterInventoryModel();
         inventoryDB = new InventoryDB();
-
     }
 
     private void saveInventory() {
 
-
         if (editText_sku.getText().toString().equalsIgnoreCase("")) {
-
         } else {
             //  Toast.makeText(getApplicationContext(), "" + editText_sku.getText().toString().replaceAll("\\s", ""), Toast.LENGTH_SHORT).show();
-
             openNewInventoryForm();
         }
 
     }
 
     private void openNewInventoryForm() {
-
-
         // get info from db
         // set info in form
-
         int quantity = 0;
-
-
         String temp = "" + editText_sku.getText().toString().replaceAll("\\s", "");
-
-
         if ((editText_sku_test.getText().toString()).equalsIgnoreCase(editText_sku.getText().toString().replaceAll("\\s", ""))) {
-
-
             if (!editText_quantity.getText().toString().isEmpty()) {
-
                 try {
                     quantity = Integer.parseInt(editText_quantity.getText().toString().trim());
                 } catch (Exception e) {
                     quantity = 0;
                 }
-
             }
 
             if (AppConstant.KEY_ONE_AT) {
@@ -222,19 +198,14 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
                 }
             }
         } else {
-
             AppConstant.ADD_INVENTORY_STATUS = "new";
-
             if (AppConstant.KEY_ONE_AT) {
                 quantity = quantity + 1;
             } else {
-
                 quantity = 0;
-
             }
         }
         editText_quantity.setText("" + quantity);
-
         editText_sku_test.getText().clear();
         editText_sku_test.setText(editText_sku.getText().toString().replaceAll("\\s", ""));
         String str = editText_sku.getText().toString().replaceAll("\\s", "");
@@ -264,35 +235,27 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
         if (!AppConstant.KEY_ONE_AT) {
 
             if (isInternet()) {
-
                 promptSpeechInput();
-
             } else {
                 noVoiceOrInternet();
-
-                new CustomDialog().dialog_enable_internet(InventoryActivity.this, " Please enable Internet for working of \"Voice to Text\" ");
+                new CustomDialog().dialog_ok_button(InventoryActivity.this, " Please enable Internet for working of \"Voice to Text\" ");
             }
 
         } else {
-
             saveInventoryToDB();
-
         }
-
         editText_sku.getText().clear();
         editText_sku.requestFocus();
-
     }
 
     private void saveInventoryToDB() {
 
-        String table_name = session.getString(session.KEY_AUDITOR_JOB_TABLE_NAME);
+        String job_table_name = session.getString(session.KEY_AUDITOR_JOB_TABLE_NAME);
 
         InventoryModel inventoryModel = new InventoryModel();
         inventoryModel.setPrd_sku(editText_sku_test.getText().toString());
 
         if (editText_price.getText().toString().equalsIgnoreCase("") || editText_price.getText().toString().isEmpty()) {
-
             inventoryModel.setPrd_price(0);
         } else {
             inventoryModel.setPrd_price(Integer.parseInt(editText_price.getText().toString()));
@@ -303,22 +266,17 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
 
         try {
             InventoryDB inventoryDB = new InventoryDB();
-            inventoryDB.addInventory(table_name, inventoryModel, InventoryActivity.this);
-
+            inventoryDB.addInventory(job_table_name, inventoryModel, InventoryActivity.this);
             Toast.makeText(getApplicationContext(), "Saved Successfully", Toast.LENGTH_SHORT).show();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
 
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
@@ -329,38 +287,23 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
         switch (v.getId()) {
 
             case R.id.linearLay_btn_back:
-
                 finish();
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-
                 break;
 
-
             case R.id.button_reset:
-
                 resetForm();
-
                 break;
 
             case R.id.button_save:
-
                 if (editText_sku_test.getText().toString().isEmpty() || editText_sku_test.getText().toString().equalsIgnoreCase("")) {
-
-
                      Toast.makeText(getApplicationContext(), "Please Scan the SKU", Toast.LENGTH_SHORT).show();
-
                 }else{
-
                     saveInventoryToDB();
                 }
-
-
-                // resetForm();
-
+               // resetForm();
                 break;
-
         }
-
     }
 
     private void resetForm() {
@@ -370,7 +313,6 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
         editText_quantity.getText().clear();
         editText_desc.getText().clear();
         editText_test.getText().clear();
-
         editText_sku.requestFocus();
 
         try {
@@ -386,13 +328,10 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
     private void promptSpeechInput() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 
-
         intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 4);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         // intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS,500);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-
-
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.speech_prompt));
         try {
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
@@ -402,7 +341,6 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
                     Toast.LENGTH_SHORT).show();
 
             noVoiceOrInternet();
-
         }
     }
 
@@ -410,26 +348,17 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
         int quantity = 0;
         if ((editText_sku_test.getText().toString()).equalsIgnoreCase(editText_sku.getText().toString().replaceAll("\\s", ""))) {
 
-
             if (!editText_quantity.getText().toString().isEmpty()) {
-
                 try {
                     quantity = Integer.parseInt(editText_quantity.getText().toString().trim());
                 } catch (Exception e) {
                     quantity = 0;
                 }
-
             }
-
-
         } else {
             quantity = 0;
         }
-
-
         editText_quantity.setText("" + (quantity + 1));
-
-
         saveInventoryToDB();
     }
 
@@ -444,12 +373,9 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
         switch (requestCode) {
             case REQ_CODE_SPEECH_INPUT: {
                 if (resultCode == RESULT_OK && null != data) {
-
                     ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-
                     editText_test.setText(result.get(0));
                     setQuantity(result.get(0));
-
                 }
                 break;
             }
@@ -470,19 +396,15 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
             } catch (Exception e) {
                 quantity = 0;
             }
-
         }
 
 
         for (int i = 0; i < text.length; i++) {
-
-
             try {
                 quantity = quantity + Integer.parseInt(text[i].trim());
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
-
         }
 
         editText_quantity.setText("" + quantity);
@@ -593,38 +515,24 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
             boolean hasFilePermission = (ContextCompat.checkSelfPermission(InventoryActivity.this,
                     Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
 
-
             if (!hasFilePermission) {
-
-
                 if (PERMISSION_COUNT > 1) {
                     dialog_allow_permission(InventoryActivity.this, " Record Audio permission is needed");
                 }
-
 
                 ActivityCompat.requestPermissions(InventoryActivity.this,
                         new String[]{Manifest.permission.RECORD_AUDIO
                         },
                         10);
-
-
                 String str = "temp" + PERMISSION_COUNT;
-
-
-                PERMISSION_COUNT++;
+               PERMISSION_COUNT++;
             }
-
 
             boolean hasPermissionDenied = (ContextCompat.checkSelfPermission(InventoryActivity.this,
                     Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED);
 
-
             if (hasPermissionDenied) {
-
-
             }
-
-
         }
     }
 
@@ -651,7 +559,7 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
             requestPermissions(new String[]{RECORD_AUDIO}, REQUEST_RECORD_AUDIO);
 
 
-            //    new CustomDialog().dialog_enable_internet(InventoryActivity.this, "Needed Permission For Recorded Audio");
+            //    new CustomDialog().dialog_ok_button(InventoryActivity.this, "Needed Permission For Recorded Audio");
 
 
                      /*   }

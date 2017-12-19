@@ -12,7 +12,6 @@ import java.lang.reflect.Field;
 public class FontsOverride {
 
 
-
     public static void setDefaultFont(Context context,String staticTypefaceFieldName, String fontAssetName) {
 
         final Typeface regular = Typeface.createFromAsset(context.getAssets(),"fonts/"+fontAssetName);

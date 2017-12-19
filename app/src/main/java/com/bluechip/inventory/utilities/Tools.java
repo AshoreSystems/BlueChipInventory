@@ -6,8 +6,10 @@ import android.content.pm.PackageManager;
 import android.util.DisplayMetrics;
 import android.view.inputmethod.InputMethodManager;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -99,4 +101,43 @@ public class Tools {
 		return formattedDatewithTime;
 	}
 
+	public static String stringToDate(String str_date) {
+
+
+		String string_date="";
+		//SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		SimpleDateFormat format_date = new SimpleDateFormat("yyyy-dd-MM HH:mm:ss");
+		try {
+			Date date = format_date.parse(str_date);
+			SimpleDateFormat dfwithtime = new SimpleDateFormat("yyyy-dd-MM");
+			string_date=dfwithtime.format(date);
+
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return string_date;
+	}
+
+
+	public static boolean isGreaterOrEqualDate(String today_date,String updated_date){
+
+		boolean is_greater =  false;
+
+		try{
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Date date1 = sdf.parse(today_date);
+			Date date2 = sdf.parse(updated_date);
+
+			if(date1.after(date2)){
+				is_greater = true;
+			}
+			if(date1.before(date2)){
+				is_greater =  true;
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+
+		return is_greater;
+	}
 }

@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:alpha="0.3"
-        android:src="@drawable/icons_task"/>
+        android:src="@drawable/icons_report"/>
 
 
     <LinearLayout
@@ -48,82 +48,27 @@
             android:orientation="vertical"
             android:visibility="visible">
 
-            <LinearLayout
-
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:gravity="end|center_vertical"
-
-
-                >
-
-                <TextView
-                    android:id="@+id/editText_one_at"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/input_text_height"
-                    android:layout_margin="5dp"
-                    android:layout_marginRight="10dp"
-                    android:gravity="center_vertical"
-                    android:text="One-at"
-                    android:textColor="@color/color_grey_dark_text"
-                    android:textSize="@dimen/input_text"
-                    />
-
-                <Switch
-                    android:id="@+id/switch_one_at"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:textOff=""
-                    android:textOn=""
-                    android:thumb="@drawable/switch_selector"
-                    android:track="@drawable/switch_custom_track"/>
-
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_margin="5dp"
-                android:background="@color/color_grey_dark"
-                />
-
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view_inventory"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:scrollbars="vertical"
-
                 android:layout_margin="5dp"/>
 
-
-
         </LinearLayout>
+
     </LinearLayout>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_add"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginBottom="@dimen/float_bottom_margin"
-        android:layout_marginRight="@dimen/float_right_margin"
-        android:src="@drawable/button_add"
 
-
-        app:backgroundTint="@color/colorPrimary"
-        app:fabSize="mini"/>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_upload"
+        android:id="@+id/fab_generate_report"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/button_upload"
+        android:src="@drawable/icons_report_white"
         app:backgroundTint="@color/color_orange"
         app:fabSize="normal"
         />

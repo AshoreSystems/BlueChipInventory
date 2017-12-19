@@ -6,6 +6,7 @@
 package com.bluechip.inventory.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -15,10 +16,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -47,11 +50,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.Manifest.permission.READ_CONTACTS;
+import static com.bluechip.inventory.R.id.email;
+
 
 public class LoginActivity extends Activity {
     private String TAG = "Login:";
     // private static final String TAG = RegisterActivity.class.getSimpleName();
-    private Button btnLogin;
+    private Button btnLogin, button_forget_pwd;
     private Button btnLinkToRegister;
     private AutoCompleteTextView inputEmail;
     private EditText inputPassword;
@@ -69,21 +74,25 @@ public class LoginActivity extends Activity {
 
 
     // parsing
-    private static int MAX_DOWNLOAD = 0;
 
     public String JSON_AUDITOR = "auditor_details";
     public String JSON_JOBS = "jobs_details";
     public String JSON_INVENTORY = "inventory_details";
     public String JSON_INVENTORY_DATA = "inventory_data";
 
+    // progress
     private ProgressDialog progressDialog_status;
     public Handler progressBarHandler1 = new Handler();
     public static Thread mThread;
+    private static int MAX_DOWNLOAD = 0;
     private static int CURRENT_PROGRESS = 0;
     Context context = null;
 
 
-    // private SQLiteHandler db;
+    //forget password
+    public AlertDialog dialog;
+    LinearLayout progress_forget_pwd;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -111,10 +120,12 @@ public class LoginActivity extends Activity {
         relLay_logo.setVisibility(View.GONE);
 
 
-        inputEmail = (AutoCompleteTextView) findViewById(R.id.email);
+        inputEmail = (AutoCompleteTextView) findViewById(email);
         inputPassword = (EditText) findViewById(R.id.password);
         btnLogin = (Button) findViewById(R.id.button_login);
+        button_forget_pwd = (Button) findViewById(R.id.button_forget_pwd);
         login_progress = (ProgressBar) findViewById(R.id.login_progress);
+
 
         // btnLinkToRegister = (Button) findViewById(R.id.btnLinkToRegisterScreen);
 
@@ -127,6 +138,16 @@ public class LoginActivity extends Activity {
 
         // SQLite database handler
         //  db = new SQLiteHandler(getApplicationContext());
+        button_forget_pwd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                showDialog(LoginActivity.this);
+
+                //startActivity(new Intent(LoginActivity.this,ForgetPasswordActivity.class));
+
+            }
+        });
 
 
         // Login button Click Event
@@ -136,7 +157,7 @@ public class LoginActivity extends Activity {
                 String email = inputEmail.getText().toString().trim();
                 String password = inputPassword.getText().toString().trim();
 
-                if (isInternet()) {
+                if (isInternetOn()) {
 
                     // fabric test report
                     //  forceCrash(view);
@@ -145,7 +166,6 @@ public class LoginActivity extends Activity {
                     // Check for empty data in the form
                     if (!email.isEmpty() && !password.isEmpty()) {
                         // login user
-
                         //  showLoadDialog();
                         checkLogin(email, password);
                     } else {
@@ -155,9 +175,7 @@ public class LoginActivity extends Activity {
                                 .show();
                     }
                 } else {
-
-
-                    new CustomDialog().dialog_enable_internet(LoginActivity.this, "Please enable Internet");
+                    new CustomDialog().dialog_ok_button(LoginActivity.this, "Please enable Internet");
                 }
 
 
@@ -178,8 +196,7 @@ public class LoginActivity extends Activity {
         login_progress.setVisibility(View.VISIBLE);
 
 
-
-       JSONObject obj = null;
+        JSONObject obj = null;
         obj = new JSONObject();
         try {
             obj.put("user_email", email);
@@ -196,7 +213,6 @@ public class LoginActivity extends Activity {
     }
 
 
-
     private void showStatusDialog() {
         if (!progressDialog_status.isShowing())
             progressDialog_status.show();
@@ -210,11 +226,11 @@ public class LoginActivity extends Activity {
 
     public void getLoginResposeFromVolley(JSONObject response) {
         Log.e(TAG, "" + response.toString());
-        DatabaseHandler db = new DatabaseHandler(getApplicationContext());
-        try {
-            String status = response.getString("status");
 
-            if (status.equalsIgnoreCase("1")) {
+        try {
+            int status = response.getInt("status");
+
+            if (status == 1) {
 
                 login_progress.setVisibility(View.GONE);
                 relLay_logo.setVisibility(View.VISIBLE);
@@ -223,7 +239,6 @@ public class LoginActivity extends Activity {
 
             } else {
                 login_progress.setVisibility(View.GONE);
-                hideStatusDialog();
                 Toast.makeText(getApplicationContext(), "email or password is wrong", Toast.LENGTH_SHORT).show();
             }
         } catch (JSONException e) {
@@ -266,7 +281,7 @@ public class LoginActivity extends Activity {
     }
 
     // internet
-    public boolean isInternet() {
+    public boolean isInternetOn() {
         connectionDetector = new ConnectionDetector(this);
         //isInternetPresent = connectionDetector.isConnectingToInternet();
         return connectionDetector.haveNetworkConnection();
@@ -296,7 +311,6 @@ public class LoginActivity extends Activity {
         // progressDialog_status.setProgressNumberFormat(null);
         progressDialog_status.setProgress(0);
 
-
         try {
             JSONArray jsonObject_job_details = data.getJSONArray(JSON_JOBS);
             JSONArray jsonObject_inventory_details = data.getJSONArray(JSON_INVENTORY);
@@ -305,7 +319,6 @@ public class LoginActivity extends Activity {
             for (int i = 0; i < jsonObject_inventory_details.length(); i++) {
                 JSONObject jsonObject = jsonObject_inventory_details.getJSONObject(i);
                 JSONArray jsonArray = jsonObject.getJSONArray("inventory_data");
-
                 master_length = master_length + jsonArray.length();
             }
             // MAX_DOWNLOAD = MAX_DOWNLOAD + job_length + master_total_length;
@@ -352,8 +365,7 @@ public class LoginActivity extends Activity {
                     for (int i = 0; i < jsonObject_job_details.length(); i++) {
 
                         JSONObject jsonObject_job_ = jsonObject_job_details.getJSONObject(i);
-                        str_auditor_jobs = "" + jsonObject_job_.getInt("job_id") + "$";
-
+                        str_auditor_jobs = str_auditor_jobs + "" + jsonObject_job_.getInt("job_id") + "$";
 
                         String table_inventory_auditor_job = "table_inventory_aud"
                                 + jsonObject_auditor_details.getString("user_id")
@@ -374,6 +386,7 @@ public class LoginActivity extends Activity {
 
                         JobModel jobModel = new JobModel();
                         jobModel.setJob_id(jsonObject_job_.getInt("job_id"));
+                        jobModel.setJob_auditor_id(jsonObject_auditor_details.getInt("user_id"));
                         jobModel.setJob_cust_id(jsonObject_job_.getInt("job_cust_id"));
                         jobModel.setJob_added_date(jsonObject_job_.getString("job_added_date"));
                         jobModel.setJob_one_at(jsonObject_job_.getString("job_one_at"));
@@ -471,23 +484,12 @@ public class LoginActivity extends Activity {
                             e.printStackTrace();
                         }
 
-
                         JSONArray jsonArray = jsonObject.getJSONArray("inventory_data");
-                        String table_master = "table_master_costumer" + jsonObject.getInt("cust_id");
+                        String table_master_name = "table_master_costumer" + jsonObject.getInt("cust_id");
+                        String temp_upload_date = jsonObject.getString("upload_date");
 
-                        // remove indexing if exist----------------
-
-                        // create dynamic master table -- table_master_costumer_cust_id
-
-                        try {
-                            DatabaseHandler DH = new DatabaseHandler(context);
-                            SQLiteDatabase db = DH.OpenWritable();
-                            DH.createMasterTable(table_master, db);
-                            db.close();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            String str1 = "";
-                        }
+                        // check table is present
+                        boolean is_table_present = inventoryDB.isMasterTablePresent(table_master_name, context);
 
                         // update progress
                         CURRENT_PROGRESS++;
@@ -500,38 +502,107 @@ public class LoginActivity extends Activity {
                         Log.e("STATUS ", "" + CURRENT_PROGRESS);
 
 
-                        // customer master inventory ------------------------------------------------
-                        for (int j = 0; j < jsonArray.length(); j++) {
-
-                            JSONObject jsonObject1 = jsonArray.getJSONObject(j);
-
-                            MasterInventoryModel masterInventory = new MasterInventoryModel();
-
-
-                            masterInventory.setPrd_id( jsonObject1.getInt("prd_id"));
-                            masterInventory.setPrd_category(jsonObject1.getString("prd_category"));
-                            masterInventory.setPrd_sku(jsonObject1.getString("prd_SKU"));
-                            masterInventory.setPrd_desc(jsonObject1.getString("prd_description"));
-
-                            masterInventory.setPrd_price((int) (Float.parseFloat(jsonObject1.getString("prd_price"))*100));
-
-                            inventoryDB.addMasterInventory(table_master, masterInventory, context);
-
-
-                            // update progress
-                            CURRENT_PROGRESS++;
-                            try {
-                                Thread.sleep(20);
-                                progressDialog_status.setProgress(CURRENT_PROGRESS);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
+                        /*if(table_present){
+                            if(date is different){
+                                save inventory
                             }
-                            Log.e("STATUS ", "" + CURRENT_PROGRESS);
+                        }else{
+                            create table
+                            save inventory
+                        }
+                        */
+
+
+                        // remove indexing if exist----------------
+                        // create dynamic master table -- table_master_costumer_cust_id
+                        // add indexing if not exist----------------
+
+
+                        if (is_table_present) { // table is present
+
+                            boolean is_master_updated = inventoryDB.isMasterUpdated(jsonObject.getInt("cust_id"), temp_upload_date, context);
+
+                            if (is_master_updated) {
+
+                                // delete rows and create master table
+                                try {
+                                    DatabaseHandler DH = new DatabaseHandler(context);
+                                    DH.removeMasterTableInventories(table_master_name);
+
+                                    createMasterTable(table_master_name);
+                                } catch (Exception e) {
+
+                                }
+
+
+                                // add inventory
+
+                                for (int j = 0; j < jsonArray.length(); j++) {
+
+                                    JSONObject jsonObject1 = jsonArray.getJSONObject(j);
+                                    MasterInventoryModel masterInventory = new MasterInventoryModel();
+
+                                    masterInventory.setPrd_id(jsonObject1.getInt("prd_id"));
+                                    masterInventory.setPrd_category(jsonObject1.getString("prd_category"));
+                                    masterInventory.setPrd_sku(jsonObject1.getString("prd_SKU"));
+                                    masterInventory.setPrd_desc(jsonObject1.getString("prd_description"));
+                                    masterInventory.setPrd_price((int) (Float.parseFloat(jsonObject1.getString("prd_price")) * 100));
+
+                                    inventoryDB.addMasterInventory(table_master_name, masterInventory, context);
+
+                                    // update progress
+                                    CURRENT_PROGRESS++;
+                                    try {
+                                        Thread.sleep(20);
+                                        progressDialog_status.setProgress(CURRENT_PROGRESS);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    Log.e("STATUS ", "" + CURRENT_PROGRESS);
+                                }
+                            }
+                        } else { // is table is not present
+
+                            // create master table
+                            try {
+                                createMasterTable(table_master_name);
+                            } catch (Exception e) {
+
+                            }
+
+                            // add inventory
+
+                            for (int j = 0; j < jsonArray.length(); j++) {
+
+                                JSONObject jsonObject1 = jsonArray.getJSONObject(j);
+                                MasterInventoryModel masterInventory = new MasterInventoryModel();
+
+                                masterInventory.setPrd_id(jsonObject1.getInt("prd_id"));
+                                masterInventory.setPrd_category(jsonObject1.getString("prd_category"));
+                                masterInventory.setPrd_sku(jsonObject1.getString("prd_SKU"));
+                                masterInventory.setPrd_desc(jsonObject1.getString("prd_description"));
+                                masterInventory.setPrd_price((int) (Float.parseFloat(jsonObject1.getString("prd_price")) * 100));
+
+                                inventoryDB.addMasterInventory(table_master_name, masterInventory, context);
+
+                                // update progress
+                                CURRENT_PROGRESS++;
+                                try {
+                                    Thread.sleep(20);
+                                    progressDialog_status.setProgress(CURRENT_PROGRESS);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                                Log.e("STATUS ", "" + CURRENT_PROGRESS);
+                            }
+
                         }
 
-                        // add indexing if not exist----------------
+
                     }
-                    //  check Master List
+
+
+                    //  checking Master List
                     InventoryDB inventoryDBchk = new InventoryDB();
                     String table_master = "table_master_costumer1";
                     List<MasterInventoryModel> masterList = new ArrayList<MasterInventoryModel>();
@@ -540,7 +611,7 @@ public class LoginActivity extends Activity {
                     progressBarHandler1
                             .post(new Runnable() {
                                 public void run() {
-                                    if (CURRENT_PROGRESS == MAX_DOWNLOAD) {
+                                    if (CURRENT_PROGRESS >= MAX_DOWNLOAD) {
                                         progressDialog_status.setTitle("Done");
 
                                         try {
@@ -548,7 +619,6 @@ public class LoginActivity extends Activity {
                                         } catch (InterruptedException e) {
                                             e.printStackTrace();
                                         }
-
                                     }
 
                                     try {
@@ -556,12 +626,9 @@ public class LoginActivity extends Activity {
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
-
                                     openDashBoard();
                                 }
                             });
-
-
                 } catch (JSONException e) {
                     String str = "json";
                     e.printStackTrace();
@@ -569,13 +636,137 @@ public class LoginActivity extends Activity {
                     String str = "temp";
                     e.printStackTrace();
                 }
-
             }
         };
         mThread.start();
+    }
+
+    private void createMasterTable(String table_master_name) {
+
+
+        // create table
+        try {
+            DatabaseHandler DH = new DatabaseHandler(context);
+            SQLiteDatabase db = DH.OpenWritable();
+            DH.createMasterTable(table_master_name, db);
+            db.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            String str1 = "";
+        }
+    }
+
+    public void showDialog(Context context) {
+       /* final Dialog dialog = new Dialog(activity);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(true);
+        dialog.setContentView(R.layout.forget_pwd_dialog);*/
+
+
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View convertView = inflater.inflate(R.layout.forget_pwd_dialog, null);
+        alertDialog.setView(convertView);
+
+        final EditText editText_email = (EditText) convertView.findViewById(R.id.editText_email);
+        final Button button_reset_pwd = (Button) convertView.findViewById(R.id.button_reset_pwd);
+        Button button_back = (Button) convertView.findViewById(R.id.button_back);
+        progress_forget_pwd = (LinearLayout) convertView.findViewById(R.id.progress_forget_pwd);
+
+        progress_forget_pwd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+        dialog = alertDialog.create();
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+
+        editText_email.setText(inputEmail.getText().toString());
+
+        button_reset_pwd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (editText_email.getText().toString().isEmpty()) {
+
+                    Toast.makeText(getApplicationContext(), "Please enter email", Toast.LENGTH_SHORT).show();
+
+
+                } else if (!isInternetOn()) {
+
+                    new CustomDialog().dialog_ok_button(LoginActivity.this, "Please enable Internet");
+
+                } else {
+
+                    resetPassword(editText_email.getText().toString());
+
+                }
+
+            }
+        });
+
+
+        button_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+
+            }
+        });
+
+
+
+
+        /*Button button_cancel = (Button) dialog.findViewById(R.id.button_cancel);
+        Button button_ok = (Button) dialog.findViewById(R.id.button_ok);*/
+
+    }
+
+    private void resetPassword(String email) {
+
+        progress_forget_pwd.setVisibility(View.VISIBLE);
+
+
+        JSONObject obj = null;
+        obj = new JSONObject();
+        try {
+            obj.put("user_email", email);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        VolleyWebservice volleyWebservice = new VolleyWebservice(LoginActivity.this, "ForgetPassword", "Please wait", AppConfig.URL_FORGET_PWD, obj);
 
 
     }
 
 
+    public void getForgetPasswordResposeFromVolley(JSONObject response) {
+        try {
+            int status = response.getInt("status");
+
+            if (status == 1) {
+
+                progress_forget_pwd.setVisibility(View.GONE);
+                dialog.dismiss();
+
+                new CustomDialog().dialog_ok_button(LoginActivity.this, "Please check email for new password");
+
+                // Toast.makeText(getApplicationContext(), "Please check email for reset password", Toast.LENGTH_SHORT).show();
+
+
+            } else {
+                progress_forget_pwd.setVisibility(View.GONE);
+                Toast.makeText(getApplicationContext(), "Please enter the register email", Toast.LENGTH_SHORT).show();
+            }
+        } catch (JSONException e) {
+
+        }
+    }
 }

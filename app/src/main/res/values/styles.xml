@@ -25,7 +25,7 @@
 
     <style name="Theme.AppCompat.Light.NoActionBar.FullScreen" parent="@style/Theme.AppCompat.Light">
         <item name="windowNoTitle">true</item>
-
+        <item name="windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowDisablePreview">true</item>
@@ -36,6 +36,8 @@
         <item name="android:background">@drawable/top_bar</item>
         <item name="android:windowDisablePreview">true</item>
         <item name="android:windowContentOverlay">@null</item>
+        <item name="android:height">@dimen/actionbar_height</item>
+
 
 
     </style>
@@ -47,6 +49,16 @@
 
  <!--Drawer -->
 
+        <style name="Theme.Transparent" parent="@style/Theme.AppCompat.Light">
+            <item name="android:windowIsTranslucent">true</item>
+            <item name="android:windowBackground">@android:color/transparent</item>
+            <item name="android:windowContentOverlay">@null</item>
+            <item name="android:windowNoTitle">true</item>
+            <item name="android:windowIsFloating">true</item>
+            <item name="android:backgroundDimEnabled">false</item>
+            <item name="android:windowFullscreen">true</item>
+            <item name="android:windowDisablePreview">true</item>
+        </style>
 
 
 </resources>

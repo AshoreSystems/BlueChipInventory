@@ -4,6 +4,8 @@
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#2b72a1</color>
     <color name="color_app_blue">#3080B6</color>
+
+    <color name="transparent_color_app_blue">#99ffffff</color>
     <color name="color_app_blue_light">#2f7db3</color>
     <color name="colorText">#3F51B5</color>
     <color name="colorEdittext">#a0aefc</color>
@@ -16,6 +18,9 @@
     <color name="color_red">#e60e0a</color>
     <color name="color_blue">#3F51B5</color>
     <color name="color_orange">#FF8C00</color>
+    <color name="transparent_black_tutorial">#80000000</color>
+    <color name="transparent_app_blue">#803080B6</color>
+
 
 
 </resources>

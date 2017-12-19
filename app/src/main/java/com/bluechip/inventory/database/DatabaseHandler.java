@@ -165,7 +165,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    // Dynamic Table Creation
+
     public void createMasterTable(String table_name, SQLiteDatabase db) {
 
         // Master Table
@@ -217,6 +217,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
 
     }
+    public void removeMasterTableInventories(String table_master) {
 
+        SQLiteDatabase db = this.getWritableDatabase(); // helper is object extends SQLiteOpenHelper
+        db.execSQL("delete from " + table_master);
+        db.close();
+    }
 
 }

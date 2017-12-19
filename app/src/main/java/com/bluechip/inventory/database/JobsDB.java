@@ -23,71 +23,37 @@ public class JobsDB {
         DatabaseHandler DH = new DatabaseHandler(context);
         SQLiteDatabase db = DH.OpenWritable();
 
-
         int id = jobs.getJob_id();
         ContentValues values = new ContentValues();
 
+        values.put(DatabaseHandler.KEY_JOB_ID, jobs.getJob_id());
+        values.put(DatabaseHandler.KEY_JOB_AUDITOR_ID, jobs.getJob_auditor_id());
+        values.put(DatabaseHandler.KEY_JOB_CUST_ID, jobs.getJob_cust_id());
+        values.put(DatabaseHandler.KEY_JOB_ADDED_DATE, jobs.getJob_added_date());
+        values.put(DatabaseHandler.KEY_JOB_ONE_AT, jobs.getJob_one_at());
+        values.put(DatabaseHandler.KEY_AREA_ID, jobs.getArea_id());
+        values.put(DatabaseHandler.KEY_AREA_NAME, jobs.getArea_name());
+        values.put(DatabaseHandler.KEY_SUB_AREA_ID, jobs.getSub_area_id());
+        values.put(DatabaseHandler.KEY_SUB_AREA_NAME, jobs.getSub_area_name());
+        values.put(DatabaseHandler.KEY_SEC_ID, jobs.getSec_id());
+        values.put(DatabaseHandler.KEY_SEC_NAME, jobs.getSec_name());
+        values.put(DatabaseHandler.KEY_SUB_SECTION_ID, jobs.getSub_section_id());
+        values.put(DatabaseHandler.KEY_SUB_SECTION_NAME, jobs.getSub_section_name());
+        values.put(DatabaseHandler.KEY_LOCATION_ID, jobs.getLocation_id());
+        values.put(DatabaseHandler.KEY_LOCATION_ADDRESS, jobs.getLocation_address());
+        values.put(DatabaseHandler.KEY_FACILITY_NAME, jobs.getFacility_name());
+
         if (getJobCount(db, id) < 1) {
-
-
-
-
-            values.put(DatabaseHandler.KEY_JOB_ID, jobs.getJob_id());
-            values.put(DatabaseHandler.KEY_JOB_AUDITOR_ID, jobs.getJob_auditor_id());
-            values.put(DatabaseHandler.KEY_JOB_CUST_ID, jobs.getJob_cust_id());
-            values.put(DatabaseHandler.KEY_JOB_ADDED_DATE, jobs.getJob_added_date());
-            values.put(DatabaseHandler.KEY_JOB_ONE_AT, jobs.getJob_one_at());
-            values.put(DatabaseHandler.KEY_AREA_ID, jobs.getArea_id());
-            values.put(DatabaseHandler.KEY_AREA_NAME, jobs.getArea_name());
-            values.put(DatabaseHandler.KEY_SUB_AREA_ID, jobs.getSub_area_id());
-            values.put(DatabaseHandler.KEY_SUB_AREA_NAME, jobs.getSub_area_name());
-            values.put(DatabaseHandler.KEY_SEC_ID, jobs.getSec_id());
-            values.put(DatabaseHandler.KEY_SEC_NAME, jobs.getSec_name());
-            values.put(DatabaseHandler.KEY_SUB_SECTION_ID, jobs.getSub_section_id());
-            values.put(DatabaseHandler.KEY_SUB_SECTION_NAME, jobs.getSub_section_name());
-            values.put(DatabaseHandler.KEY_LOCATION_ID, jobs.getLocation_id());
-            values.put(DatabaseHandler.KEY_LOCATION_ADDRESS, jobs.getLocation_address());
-            values.put(DatabaseHandler.KEY_FACILITY_NAME, jobs.getFacility_name());
-
 
             // Insert Row
             db.insert(DatabaseHandler.TABLE_JOBS_DETAILS, null, values);
-
             int checkinsert = getJobCount(db, jobs.getJob_id());
-
             db.close(); // Closing database connection
+
         } else {
-
-
-
-
-            values.put(DatabaseHandler.KEY_JOB_ID, jobs.getJob_id());
-            values.put(DatabaseHandler.KEY_JOB_AUDITOR_ID, jobs.getJob_auditor_id());
-            values.put(DatabaseHandler.KEY_JOB_CUST_ID, jobs.getJob_cust_id());
-            values.put(DatabaseHandler.KEY_JOB_ADDED_DATE, jobs.getJob_added_date());
-            values.put(DatabaseHandler.KEY_JOB_ONE_AT, jobs.getJob_one_at());
-
-            values.put(DatabaseHandler.KEY_AREA_ID, jobs.getArea_id());
-            values.put(DatabaseHandler.KEY_AREA_NAME, jobs.getArea_name());
-
-            values.put(DatabaseHandler.KEY_SUB_AREA_ID, jobs.getSub_area_id());
-            values.put(DatabaseHandler.KEY_SUB_AREA_NAME, jobs.getSub_area_name());
-
-            values.put(DatabaseHandler.KEY_SEC_ID, jobs.getSec_id());
-            values.put(DatabaseHandler.KEY_SEC_NAME, jobs.getSec_name());
-
-            values.put(DatabaseHandler.KEY_SUB_SECTION_ID, jobs.getSub_section_id());
-            values.put(DatabaseHandler.KEY_SUB_SECTION_NAME, jobs.getSub_section_name());
-
-            values.put(DatabaseHandler.KEY_LOCATION_ID, jobs.getLocation_id());
-            values.put(DatabaseHandler.KEY_LOCATION_ADDRESS, jobs.getLocation_address());
-            values.put(DatabaseHandler.KEY_FACILITY_NAME, jobs.getFacility_name());
-
             int checkinsert = db.update(DatabaseHandler.TABLE_JOBS_DETAILS, values,
                     (DatabaseHandler.KEY_JOB_ID + " = ? "), new String[]{String.valueOf(jobs.getJob_id())});
             db.close();
-
-
         }
 
 
@@ -154,7 +120,7 @@ public class JobsDB {
     }
 
 
-    public List<JobModel> getJobList(Context context) {
+    public List<JobModel> getJobList(String auditor_id, Context context) {
 
         List<JobModel> jobModelList = new ArrayList<JobModel>();
 
@@ -162,8 +128,10 @@ public class JobsDB {
         SQLiteDatabase db = DH.OpenWritable();
 
         String detailsQuery = "SELECT * FROM " + DatabaseHandler.TABLE_JOBS_DETAILS
-
-                + " ;";
+                +" WHERE "
+                + DatabaseHandler.KEY_JOB_AUDITOR_ID
+                +" ='"+auditor_id
+                + "' ;";
 
         Cursor cursor = db.rawQuery(detailsQuery, null);
 
@@ -184,13 +152,13 @@ public class JobsDB {
                 jobModel.setArea_name(cursor.getString(cursor.getColumnIndex(DatabaseHandler.KEY_AREA_NAME)));
 
                 jobModel.setSub_area_id(cursor.getString(cursor.getColumnIndex(DatabaseHandler.KEY_SUB_AREA_ID)));
-                jobModel.setSub_area_name("-"+cursor.getString(cursor.getColumnIndex(DatabaseHandler.KEY_SUB_AREA_NAME)));
+                jobModel.setSub_area_name(cursor.getString(cursor.getColumnIndex(DatabaseHandler.KEY_SUB_AREA_NAME)));
 
                 jobModel.setSec_id(cursor.getString(cursor.getColumnIndex(DatabaseHandler.KEY_SEC_ID)));
-                jobModel.setSec_name("-"+cursor.getString(cursor.getColumnIndex(DatabaseHandler.KEY_SEC_NAME)));
+                jobModel.setSec_name(cursor.getString(cursor.getColumnIndex(DatabaseHandler.KEY_SEC_NAME)));
 
                 jobModel.setSub_section_id(cursor.getString(cursor.getColumnIndex(DatabaseHandler.KEY_SUB_SECTION_ID)));
-                jobModel.setSub_section_name("-"+cursor.getString(cursor.getColumnIndex(DatabaseHandler.KEY_SUB_SECTION_NAME)));
+                jobModel.setSub_section_name(cursor.getString(cursor.getColumnIndex(DatabaseHandler.KEY_SUB_SECTION_NAME)));
 
                 jobModel.setLocation_id(cursor.getString(cursor.getColumnIndex(DatabaseHandler.KEY_LOCATION_ID)));
                 jobModel.setLocation_address(cursor.getString(cursor.getColumnIndex(DatabaseHandler.KEY_LOCATION_ADDRESS)));

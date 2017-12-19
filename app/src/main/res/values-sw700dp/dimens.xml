@@ -29,10 +29,13 @@
     <dimen name="nav_drawer">400dp</dimen>
     <dimen name="text_main_title">35dp</dimen>
     <dimen name="text_version">16dp</dimen>
-    <dimen name="text_actionbar_title">30dp</dimen>
+    <dimen name="text_actionbar_title">20dp</dimen>
     <dimen name="image_actionbar_logo">35dp</dimen>
-    <dimen name="image_actionbar_back">30dp</dimen>
+    <dimen name="image_actionbar_back">25dp</dimen>
     <dimen name="text_nav_username">20dp</dimen>
+    <dimen name="actionbar_height">65dp</dimen>
+    <dimen name="float_bottom_margin">85dp</dimen>
+    <dimen name="float_right_margin">25dp</dimen>
 
 
 </resources>

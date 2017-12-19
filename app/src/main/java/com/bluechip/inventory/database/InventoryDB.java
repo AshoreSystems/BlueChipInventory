@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.bluechip.inventory.model.CustomerModel;
 import com.bluechip.inventory.model.InventoryModel;
 import com.bluechip.inventory.model.MasterInventoryModel;
+import com.bluechip.inventory.utilities.Tools;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,34 +32,22 @@ public class InventoryDB {
         int id = customer.getCustomer_id();
 
         ContentValues values = new ContentValues();
-
+        values.put(DatabaseHandler.KEY_CUST_ID, customer.getCustomer_id());
+        values.put(DatabaseHandler.KEY_CUST_UPDATED_DATE, customer.getCustomer_updated_date());
 
         if (getCustomerCount(db, id) < 1) {
 
-            values.put(DatabaseHandler.KEY_CUST_ID, customer.getCustomer_id());
-            values.put(DatabaseHandler.KEY_CUST_UPDATED_DATE, customer.getCustomer_updated_date());
-
             // Insert Row
             db.insert(DatabaseHandler.TABLE_CUSTOMER_DETAILS, null, values);
-
             int check_insert = getCustomerCount(db, customer.getCustomer_id());
 
-            db.close(); // Closing database connection
         } else {
-
-
-            values.put(DatabaseHandler.KEY_CUST_ID, customer.getCustomer_id());
-            values.put(DatabaseHandler.KEY_CUST_UPDATED_DATE, customer.getCustomer_updated_date());
-
-
             int getCustomerCount = db.update(DatabaseHandler.TABLE_CUSTOMER_DETAILS, values,
                     (DatabaseHandler.KEY_CUST_ID + " = ? "), new String[]{String.valueOf(customer.getCustomer_id())});
-            db.close();
-
 
         }
 
-
+        db.close(); // Closing database connection
     }
 
     private int getCustomerCount(SQLiteDatabase db, int customer_id) {
@@ -105,11 +94,10 @@ public class InventoryDB {
 
         db.close(); // Closing database connection
 
-
     }
 
 
-    //Get Total Count of Que for a Event
+    //Get  Count
     public int getMasterCount(String TABLE_NAME_MASTER, SQLiteDatabase db, int product_id) {
 
 
@@ -204,34 +192,20 @@ public class InventoryDB {
         String id = inventory.getPrd_sku();
         ContentValues values = new ContentValues();
 
+        values.put(DatabaseHandler.KEY_PRD_ID, inventory.getPrd_id());
+        values.put(DatabaseHandler.KEY_PRD_CATEGORY, inventory.getPrd_category());
+        values.put(DatabaseHandler.KEY_PRD_SKU, inventory.getPrd_sku());
+        values.put(DatabaseHandler.KEY_PRD_DESCRIPTION, inventory.getPrd_desc());
+        values.put(DatabaseHandler.KEY_PRD_PRICE, inventory.getPrd_price());
+        values.put(DatabaseHandler.KEY_PRD_QUANTITY, inventory.getPrd_quantity());
+
         if (getInventoryCount(TABLE_NAME_INVENTORY, db, id) < 1) {
-
-
-            values.put(DatabaseHandler.KEY_PRD_ID, inventory.getPrd_id());
-            values.put(DatabaseHandler.KEY_PRD_CATEGORY, inventory.getPrd_category());
-            values.put(DatabaseHandler.KEY_PRD_SKU, inventory.getPrd_sku());
-            values.put(DatabaseHandler.KEY_PRD_DESCRIPTION, inventory.getPrd_desc());
-            values.put(DatabaseHandler.KEY_PRD_PRICE, inventory.getPrd_price());
-            values.put(DatabaseHandler.KEY_PRD_QUANTITY, inventory.getPrd_quantity());
-
 
             // Insert Row
             db.insert(TABLE_NAME_INVENTORY, null, values);
-
             int check_insert = getInventoryCount(TABLE_NAME_INVENTORY, db, inventory.getPrd_sku());
-
             db.close(); // Closing database connection
         } else {
-
-
-            values.put(DatabaseHandler.KEY_PRD_ID, inventory.getPrd_id());
-            values.put(DatabaseHandler.KEY_PRD_SKU, inventory.getPrd_sku());
-            values.put(DatabaseHandler.KEY_PRD_DESCRIPTION, inventory.getPrd_desc());
-            values.put(DatabaseHandler.KEY_PRD_CATEGORY, inventory.getPrd_category());
-            values.put(DatabaseHandler.KEY_PRD_PRICE, inventory.getPrd_price());
-            values.put(DatabaseHandler.KEY_PRD_QUANTITY, inventory.getPrd_quantity());
-
-
             int check_insert = db.update(TABLE_NAME_INVENTORY, values,
                     (DatabaseHandler.KEY_PRD_SKU + " = ? "), new String[]{String.valueOf(inventory.getPrd_sku())});
             db.close();
@@ -242,7 +216,7 @@ public class InventoryDB {
 
     }
 
-    //Get Total Count of Que for a Event
+    //Get  Count
     public int getInventoryCount(String TABLE_NAME_INVENTORY, SQLiteDatabase db, String product_id) {
 
 
@@ -256,6 +230,29 @@ public class InventoryDB {
 
         // get quantity
 
+        return count;
+
+
+    } //Get Total Count of inventory
+
+    public int getTotalInventoryCount(String TABLE_NAME_INVENTORY, Context context) {
+
+
+        DatabaseHandler DH = new DatabaseHandler(context);
+        SQLiteDatabase db = DH.OpenWritable();
+
+
+        String countQuery = "SELECT * FROM " + TABLE_NAME_INVENTORY
+                + " ;";
+
+
+        Cursor cursor = db.rawQuery(countQuery, null);
+        int count = cursor.getCount();
+        cursor.close();
+
+        // get quantity
+
+        db.close();
         return count;
 
 
@@ -328,4 +325,59 @@ public class InventoryDB {
 
     }
 
+
+    // Check Table
+    public boolean isMasterTablePresent(String table_name, Context context) {
+
+        boolean table_present = false;
+        DatabaseHandler DH = new DatabaseHandler(context);
+        SQLiteDatabase db = DH.OpenWritable();
+
+
+        String check_query = "SELECT name FROM sqlite_master WHERE type='table' AND name='"
+                + table_name
+                + "';";
+        Cursor cursor = db.rawQuery(check_query, null);
+
+        int count = cursor.getCount();
+        cursor.close();
+        db.close();
+
+        if (count > 0) {
+            table_present = true;
+        }
+
+        return table_present;
+
+    }
+
+    public boolean isMasterUpdated(int customer_id, String temp_upload_date, Context context) {
+
+        boolean is_updated = false;
+        CustomerModel customerModel = new CustomerModel();
+
+        DatabaseHandler DH = new DatabaseHandler(context);
+        SQLiteDatabase db = DH.OpenWritable();
+
+        String select_query = "SELECT * FROM " + DatabaseHandler.TABLE_CUSTOMER_DETAILS
+                + " WHERE "
+                + DatabaseHandler.KEY_CUST_ID + " ='" + customer_id
+                + "';";
+        Cursor cursor = db.rawQuery(select_query, null);
+
+
+        if (cursor != null)
+            cursor.moveToFirst();
+
+        customerModel.setCustomer_id(cursor.getInt(cursor.getColumnIndex(DatabaseHandler.KEY_CUST_ID)));
+        customerModel.setCustomer_updated_date(cursor.getString(cursor.getColumnIndex(DatabaseHandler.KEY_CUST_UPDATED_DATE)));
+
+
+        is_updated = new Tools().isGreaterOrEqualDate(customerModel.getCustomer_updated_date(), temp_upload_date);
+
+        cursor.close();
+        db.close();
+
+        return is_updated;
+    }
 }

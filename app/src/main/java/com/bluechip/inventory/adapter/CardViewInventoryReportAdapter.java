@@ -17,25 +17,26 @@ import com.bluechip.inventory.model.InventoryModel;
 
 import java.util.List;
 
-public class CardViewInventoryAdapter extends
-        RecyclerView.Adapter<CardViewInventoryAdapter.ViewHolder> {
+public class CardViewInventoryReportAdapter extends
+        RecyclerView.Adapter<CardViewInventoryReportAdapter.ViewHolder> {
 
     private List<InventoryModel> inventoryList;
     public JobsFragment jobsFragment;
     public ViewReportFragment viewReportFragment;
 
 
-    public CardViewInventoryAdapter(List<InventoryModel> inventoryList, JobsFragment jobsFragment) {
+
+    public CardViewInventoryReportAdapter(List<InventoryModel> inventoryList, ViewReportFragment viewReportFragment) {
         this.inventoryList = inventoryList;
-        this.jobsFragment = jobsFragment;
+        this.viewReportFragment = viewReportFragment;
     }
 
 
 
     // Create new views
     @Override
-    public CardViewInventoryAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                                  int viewType) {
+    public CardViewInventoryReportAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+                                                                        int viewType) {
         // create a new view
         View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(
                 R.layout.cardview_item_inventory, parent, false);

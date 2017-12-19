@@ -9,35 +9,35 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bluechip.inventory.R;
-import com.bluechip.inventory.fragment.JobsFragment;
+import com.bluechip.inventory.fragment.ViewReportFragment;
 import com.bluechip.inventory.model.JobModel;
 import com.bluechip.inventory.utilities.Tools;
 
 import java.util.List;
 
-public class CardViewJobAdapter extends
-        RecyclerView.Adapter<CardViewJobAdapter.ViewHolder> {
+public class CardViewJobReportAdapter extends
+        RecyclerView.Adapter<CardViewJobReportAdapter.ViewHolder> {
 
     private List<JobModel> stList;
-    public JobsFragment jobsFragment;
+    public ViewReportFragment viewReportFragment;
 
 
     String area, sub_area, section, sub_section;
 
-    public CardViewJobAdapter(List<JobModel> jobModels, JobsFragment jobsFragment) {
+    public CardViewJobReportAdapter(List<JobModel> jobModels, ViewReportFragment viewReportFragment) {
         this.stList = jobModels;
-        this.jobsFragment = jobsFragment;
+        this.viewReportFragment = viewReportFragment;
     }
 
-    public CardViewJobAdapter(List<JobModel> jobModels) {
+    public CardViewJobReportAdapter(List<JobModel> jobModels) {
         this.stList = jobModels;
 
     }
 
     // Create new views
     @Override
-    public CardViewJobAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                            int viewType) {
+    public CardViewJobReportAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+                                                                  int viewType) {
         // create a new view
         View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(
                 R.layout.cardview_item_job, parent, false);
@@ -89,7 +89,7 @@ public class CardViewJobAdapter extends
         viewHolder.relLay_item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                jobsFragment.viewInventoryList(stList.get(pos).getJob_id());
+                viewReportFragment.viewInventoryList(stList.get(pos).getJob_id());
             }
         });
     }

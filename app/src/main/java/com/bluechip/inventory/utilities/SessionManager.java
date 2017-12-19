@@ -38,8 +38,6 @@ public class SessionManager {
     public void setLogin(boolean isLoggedIn) {
 
         editor.putBoolean(KEY_IS_LOGGED_IN, isLoggedIn);
-
-
         // commit changes
         editor.commit();
 

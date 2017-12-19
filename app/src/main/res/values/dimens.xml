@@ -38,6 +38,8 @@
     <dimen name="image_actionbar_logo">25dp</dimen>
     <dimen name="image_actionbar_back">20dp</dimen>
     <dimen name="text_nav_username">15dp</dimen>
+    <dimen name="float_bottom_margin">70dp</dimen>
+    <dimen name="float_right_margin">10dp</dimen>
 
 
 </resources>
