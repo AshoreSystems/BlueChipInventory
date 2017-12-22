@@ -10,13 +10,13 @@ public class MasterInventoryModel {
     public String prd_sku;
     private String prd_desc;
     private String prd_category;
-    private int prd_price;
+    private String prd_price;
 
 
     public MasterInventoryModel() {
     }
 
-    public MasterInventoryModel(int prd_id, String prd_sku, String prd_desc, String prd_category, int prd_price) {
+    public MasterInventoryModel(int prd_id, String prd_sku, String prd_desc, String prd_category, String prd_price) {
         this.prd_id = prd_id;
         this.prd_sku = prd_sku;
         this.prd_desc = prd_desc;
@@ -60,11 +60,11 @@ public class MasterInventoryModel {
         this.prd_category = prd_category;
     }
 
-    public int getPrd_price() {
+    public String getPrd_price() {
         return prd_price;
     }
 
-    public void setPrd_price(int prd_price) {
+    public void setPrd_price(String prd_price) {
         this.prd_price = prd_price;
     }
 }

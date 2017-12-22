@@ -189,11 +189,11 @@ public class ViewReportFragment extends Fragment implements View.OnClickListener
 
                 try {
 
-                    if(((MainActivity) getActivity()).isInternetOn()){
+                    if (((MainActivity) getActivity()).isInternetOn()) {
 
-                        //  ((MainActivity) getActivity()).uploadInventory();
-                    }else {
-                        new CustomDialog().dialog_ok_button(context,getResources().getString(R.string.msg_enable_internet));
+                        ((MainActivity) getActivity()).generateInventoryReport();
+                    } else {
+                        new CustomDialog().dialog_ok_button(context, getResources().getString(R.string.msg_enable_internet));
 
 
                     }
@@ -318,20 +318,22 @@ public class ViewReportFragment extends Fragment implements View.OnClickListener
             jobList = null;
         }
 
-        jobList = jobsDB.getJobList(session.getString(session.KEY_USER_ID),context);
+        jobList = jobsDB.getJobList(session.getString(session.KEY_USER_ID), context);
 
         recycler_view_job.setHasFixedSize(true);
         recycler_view_job.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        if (jobList.size() > 0) {
+        if (mAdapter_jobs != null) {
+            mAdapter_jobs = null;
+        }
+        try {
             // set the adapter object to the Recyclerview
-            if (mAdapter_jobs != null) {
-                mAdapter_jobs = null;
-            }
             mAdapter_jobs = new CardViewJobReportAdapter(jobList, ViewReportFragment.this);
             mAdapter_jobs.notifyDataSetChanged();
             recycler_view_job.setAdapter(mAdapter_jobs);
-       }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -351,16 +353,24 @@ public class ViewReportFragment extends Fragment implements View.OnClickListener
 
             recycler_view_inventory.setHasFixedSize(true);
             recycler_view_inventory.setLayoutManager(new LinearLayoutManager(getActivity()));
+            recycler_view_inventory.removeAllViewsInLayout();
 
-            if (inventoryList.size() > 0) {
-                // create an Object for Adapter
-                if (mAdapter_inventory != null) {
-                    mAdapter_inventory = null;
-                }
+            if (mAdapter_inventory != null) {
+                mAdapter_inventory = null;
+
+
+            }
+
+
+            try {
                 mAdapter_inventory = new CardViewInventoryReportAdapter(inventoryList, ViewReportFragment.this);
                 mAdapter_inventory.notifyDataSetChanged();
                 recycler_view_inventory.setAdapter(mAdapter_inventory);
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
         }
     }
 

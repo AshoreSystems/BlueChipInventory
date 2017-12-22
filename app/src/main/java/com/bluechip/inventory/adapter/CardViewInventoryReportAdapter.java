@@ -63,17 +63,7 @@ public class CardViewInventoryReportAdapter extends
         viewHolder.textView_quantity.setText(""+inventoryList.get(position).getPrd_quantity());
         viewHolder.textView_price.setText(" $ "+ inventoryList.get(position).getPrd_price());
 
-        viewHolder.linearlay_edit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                jobsFragment.editInventory(""+inventoryList.get(pos).getPrd_desc(),
-                        inventoryList.get(pos).getPrd_sku(),
-                        inventoryList.get(pos).getPrd_quantity(),
-                        inventoryList.get(pos).getPrd_price());
-
-            }
-        });
 
         if(inventoryList.get(position).getPrd_sku().equalsIgnoreCase("") &&
         inventoryList.get(position).getPrd_desc().equalsIgnoreCase("")  ){
@@ -119,6 +109,7 @@ public class CardViewInventoryReportAdapter extends
             textView_quantity = (TextView) itemLayoutView.findViewById(R.id.textView_quantity);
             linearlay_edit= (LinearLayout) itemLayoutView.findViewById(R.id.linearlay_edit);
              cardView_layout= (CardView) itemLayoutView.findViewById(R.id.cardView_layout);
+            linearlay_edit.setVisibility(View.INVISIBLE);
 
 
         }

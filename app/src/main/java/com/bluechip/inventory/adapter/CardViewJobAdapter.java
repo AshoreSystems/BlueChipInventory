@@ -89,7 +89,9 @@ public class CardViewJobAdapter extends
         viewHolder.relLay_item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                jobsFragment.viewInventoryList(stList.get(pos).getJob_id());
+
+                int job_id = stList.get(pos).getJob_id();
+                jobsFragment.viewInventoryList(job_id);
             }
         });
     }

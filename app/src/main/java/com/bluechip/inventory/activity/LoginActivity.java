@@ -546,7 +546,7 @@ public class LoginActivity extends Activity {
                                     masterInventory.setPrd_category(jsonObject1.getString("prd_category"));
                                     masterInventory.setPrd_sku(jsonObject1.getString("prd_SKU"));
                                     masterInventory.setPrd_desc(jsonObject1.getString("prd_description"));
-                                    masterInventory.setPrd_price((int) (Float.parseFloat(jsonObject1.getString("prd_price")) * 100));
+                                    masterInventory.setPrd_price(String.valueOf((int) (Float.parseFloat(jsonObject1.getString("prd_price")) * 100)));
 
                                     inventoryDB.addMasterInventory(table_master_name, masterInventory, context);
 
@@ -581,7 +581,7 @@ public class LoginActivity extends Activity {
                                 masterInventory.setPrd_category(jsonObject1.getString("prd_category"));
                                 masterInventory.setPrd_sku(jsonObject1.getString("prd_SKU"));
                                 masterInventory.setPrd_desc(jsonObject1.getString("prd_description"));
-                                masterInventory.setPrd_price((int) (Float.parseFloat(jsonObject1.getString("prd_price")) * 100));
+                                masterInventory.setPrd_price(String.valueOf((int) (Float.parseFloat(jsonObject1.getString("prd_price")) * 100)));
 
                                 inventoryDB.addMasterInventory(table_master_name, masterInventory, context);
 

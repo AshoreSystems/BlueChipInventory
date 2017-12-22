@@ -84,6 +84,7 @@
     <string name="login_id">john.dev@gmail.com</string>
     <string name="login_pwd">12345</string>
     <string name="msg_enable_internet">Please enable  internet . .</string>
+    <string name="msg_no_record_found">No record found for current Job.</string>
 
 
 </resources>

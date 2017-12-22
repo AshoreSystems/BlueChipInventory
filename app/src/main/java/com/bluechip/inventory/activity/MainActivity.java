@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
@@ -42,6 +43,7 @@ import com.bluechip.inventory.fragment.JobsFragment;
 import com.bluechip.inventory.fragment.SettingsFragment;
 import com.bluechip.inventory.fragment.ViewReportFragment;
 import com.bluechip.inventory.model.InventoryModel;
+import com.bluechip.inventory.model.MasterInventoryModel;
 import com.bluechip.inventory.utilities.AppConfig;
 import com.bluechip.inventory.utilities.AppConstant;
 import com.bluechip.inventory.utilities.ConnectionDetector;
@@ -55,8 +57,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+
+import jxl.Workbook;
+import jxl.WorkbookSettings;
+import jxl.write.Label;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -724,175 +734,164 @@ public class MainActivity extends AppCompatActivity {
 
         if (isInternetOn()) {
 
-            final JSONObject request_object = new JSONObject();
-            final JSONObject auditor_detail = new JSONObject();
-            final JSONObject job_detail = new JSONObject();
-            final JSONArray inventory_detail_array = new JSONArray();
+// inventory details for the current job
+            final String table_name = session.getString(session.KEY_AUDITOR_JOB_TABLE_NAME);
+            final InventoryDB inventoryDB = new InventoryDB();
+
+            int total_inventory = inventoryDB.getTotalInventoryCount(table_name, MainActivity.this);
+
+            if (total_inventory > 0) {
+
+                final JSONObject request_object = new JSONObject();
+                final JSONObject auditor_detail = new JSONObject();
+                final JSONObject job_detail = new JSONObject();
+                final JSONArray inventory_detail_array = new JSONArray();
 
 
-            // total length
-            CURRENT_PROGRESS = 0;
-            MAX_UPLOAD = 0;
-            this.context = getApplicationContext();
-            //  session = new SessionManager(context);
+                // total length
+                CURRENT_PROGRESS = 0;
+                MAX_UPLOAD = 0;
+                this.context = getApplicationContext();
+                //  session = new SessionManager(context);
 
-            progressDialog_status = new ProgressDialog(MainActivity.this);
-            progressDialog_status.setCancelable(false);
-            //progressDialog_status.setTitle("Please Wait");
-            progressDialog_status.setMessage("Uploading Inventories..");
-            progressDialog_status.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            // progressDialog_status.setProgressNumberFormat(null);
-            progressDialog_status.setProgress(0);
-
-
-            try {
-                // auditor
-                auditor_detail.put(JsonConstant.KEY_user_id, session.getString(session.KEY_USER_ID));
-                auditor_detail.put(JsonConstant.KEY_user_email, session.getString(session.KEY_USER_EMAIL));
-
-                // job_details
-                job_detail.put(JsonConstant.KEY_job_id, "" + AppConstant.KEY_JOB_ID);
-                job_detail.put(JsonConstant.KEY_job_cust_id, "" + AppConstant.KEY_JOB_CUST_ID);
-                String data = Tools.formattedDatewithTime();
-                job_detail.put(JsonConstant.KEY_job_upload_date, Tools.formattedDatewithTime());
-                job_detail.put(JsonConstant.KEY_job_location_id, "" + AppConstant.KEY_JOB_LOC_ID);
-
-                // inventory details for the current job
-                final String table_name = session.getString(session.KEY_AUDITOR_JOB_TABLE_NAME);
-
-                if (!table_name.isEmpty() || !table_name.equalsIgnoreCase("")) {
-
-                    // total inventory
-                    InventoryDB inventoryDB = new InventoryDB();
-                    MAX_UPLOAD = inventoryDB.getTotalInventoryCount(table_name, MainActivity.this);
-                    MAX_UPLOAD = MAX_UPLOAD+MAX_UPLOAD;
-                    progressDialog_status.setMax(MAX_UPLOAD);
-
-                    if (MAX_UPLOAD == 0) {
-                    } else {
-                        showStatusDialog();
-                    }
-
-                    if (mThread != null) {
-                        mThread = null;
-                    }
-
-                    mThread = new Thread() {
-                        public void run() {
-                            progressBarHandler1
-                                    .post(new Runnable() {
-                                        public void run() {
-                                            progressDialog_status.setProgress(CURRENT_PROGRESS);
-                                        }
-                                    });
-
-                            try {
-                                List<InventoryModel> inventoryList = new ArrayList<InventoryModel>();
-                                InventoryDB inventoryDB = new InventoryDB();
-                                inventoryList = inventoryDB.getInventoryList(table_name, MainActivity.this);
-
-                                for (InventoryModel inventoryModel : inventoryList) {
-
-                                    JSONObject sub_inventory = new JSONObject();
-
-                                    sub_inventory.put(JsonConstant.KEY_prd_id, "" + inventoryModel.getPrd_id());
-                                    sub_inventory.put(JsonConstant.KEY_prd_description, "" + inventoryModel.getPrd_desc());
-                                    sub_inventory.put(JsonConstant.KEY_prd_sku, "" + inventoryModel.getPrd_sku());
-                                    sub_inventory.put(JsonConstant.KEY_prd_price, "" + inventoryModel.getPrd_price());
-                                    sub_inventory.put(JsonConstant.KEY_prd_category, "" + inventoryModel.getPrd_category());
-                                    sub_inventory.put(JsonConstant.KEY_prd_quantity, "" + inventoryModel.getPrd_quantity());
-
-                                    inventory_detail_array.put(sub_inventory);
+                progressDialog_status = new ProgressDialog(MainActivity.this);
+                progressDialog_status.setCancelable(false);
+                //progressDialog_status.setTitle("Please Wait");
+                progressDialog_status.setMessage("Uploading Inventories..");
+                progressDialog_status.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                // progressDialog_status.setProgressNumberFormat(null);
+                progressDialog_status.setProgress(0);
 
 
-                                    CURRENT_PROGRESS++;
-                                    try {
-                                        Thread.sleep(100);
-                                        progressDialog_status.setProgress(CURRENT_PROGRESS);
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                    Log.e("STATUS ", "" + CURRENT_PROGRESS);
-                                } for (InventoryModel inventoryModel : inventoryList) {
+                try {
+                    // auditor
+                    auditor_detail.put(JsonConstant.KEY_user_id, session.getString(session.KEY_USER_ID));
+                    auditor_detail.put(JsonConstant.KEY_user_email, session.getString(session.KEY_USER_EMAIL));
 
-                                    JSONObject sub_inventory = new JSONObject();
+                    // job_details
+                    job_detail.put(JsonConstant.KEY_job_id, "" + AppConstant.KEY_JOB_ID);
+                    job_detail.put(JsonConstant.KEY_job_cust_id, "" + AppConstant.KEY_JOB_CUST_ID);
+                    String data = Tools.formattedDatewithTime();
+                    job_detail.put(JsonConstant.KEY_job_upload_date, Tools.formattedDatewithTime());
+                    job_detail.put(JsonConstant.KEY_job_location_id, "" + AppConstant.KEY_JOB_LOC_ID);
 
-                                    sub_inventory.put(JsonConstant.KEY_prd_id, "" + inventoryModel.getPrd_id());
-                                    sub_inventory.put(JsonConstant.KEY_prd_description, "" + inventoryModel.getPrd_desc());
-                                    sub_inventory.put(JsonConstant.KEY_prd_sku, "" + inventoryModel.getPrd_sku());
-                                    sub_inventory.put(JsonConstant.KEY_prd_price, "" + inventoryModel.getPrd_price());
-                                    sub_inventory.put(JsonConstant.KEY_prd_category, "" + inventoryModel.getPrd_category());
-                                    sub_inventory.put(JsonConstant.KEY_prd_quantity, "" + inventoryModel.getPrd_quantity());
 
-                                    inventory_detail_array.put(sub_inventory);
+                    if (!table_name.isEmpty() || !table_name.equalsIgnoreCase("")) {
 
-                                    CURRENT_PROGRESS++;
-                                    try {
-                                        Thread.sleep(100);
-                                        progressDialog_status.setProgress(CURRENT_PROGRESS);
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                    Log.e("STATUS ", "" + CURRENT_PROGRESS);
-                                }
-                                // main request
-                                request_object.put(JsonConstant.KEY_auditor_details, auditor_detail);
-                                request_object.put(JsonConstant.KEY_jobs_details, job_detail);
-                                request_object.put(JsonConstant.KEY_inventory_details, inventory_detail_array);
+                        // total inventory
+                        //InventoryDB inventoryDB = new InventoryDB();
+                        MAX_UPLOAD = inventoryDB.getTotalInventoryCount(table_name, MainActivity.this);
+                        //   MAX_UPLOAD = MAX_UPLOAD + MAX_UPLOAD;
+                        progressDialog_status.setMax(MAX_UPLOAD);
 
-                                // completed
+                        if (MAX_UPLOAD == 0) {
+                        } else {
+                            showStatusDialog();
+                        }
+
+                        if (mThread != null) {
+                            mThread = null;
+                        }
+
+                        mThread = new Thread() {
+                            public void run() {
                                 progressBarHandler1
                                         .post(new Runnable() {
                                             public void run() {
-                                                if (CURRENT_PROGRESS == MAX_UPLOAD) {
-                                                    progressDialog_status.setTitle("Done");
+                                                progressDialog_status.setProgress(CURRENT_PROGRESS);
+                                            }
+                                        });
 
+                                try {
+
+                                    List<InventoryModel> inventoryList = new ArrayList<InventoryModel>();
+                                    inventoryList = inventoryDB.getInventoryList(table_name, MainActivity.this);
+
+
+                                    for (InventoryModel inventoryModel : inventoryList) {
+
+                                        JSONObject sub_inventory = new JSONObject();
+
+                                        sub_inventory.put(JsonConstant.KEY_prd_id, "" + inventoryModel.getPrd_id());
+                                        sub_inventory.put(JsonConstant.KEY_prd_description, "" + inventoryModel.getPrd_desc());
+                                        sub_inventory.put(JsonConstant.KEY_prd_sku, "" + inventoryModel.getPrd_sku());
+                                        sub_inventory.put(JsonConstant.KEY_prd_price, "" + inventoryModel.getPrd_price());
+                                        sub_inventory.put(JsonConstant.KEY_prd_category, "" + inventoryModel.getPrd_category());
+                                        sub_inventory.put(JsonConstant.KEY_prd_quantity, "" + inventoryModel.getPrd_quantity());
+
+                                        inventory_detail_array.put(sub_inventory);
+
+
+                                        CURRENT_PROGRESS++;
+                                        try {
+                                            Thread.sleep(100);
+                                            progressDialog_status.setProgress(CURRENT_PROGRESS);
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                        Log.e("STATUS ", "" + CURRENT_PROGRESS);
+                                    }
+                                    // main request
+                                    request_object.put(JsonConstant.KEY_auditor_details, auditor_detail);
+                                    request_object.put(JsonConstant.KEY_jobs_details, job_detail);
+                                    request_object.put(JsonConstant.KEY_inventory_details, inventory_detail_array);
+
+                                    // completed
+                                    progressBarHandler1
+                                            .post(new Runnable() {
+                                                public void run() {
+                                                    if (CURRENT_PROGRESS == MAX_UPLOAD) {
+                                                        progressDialog_status.setTitle("Done");
+
+                                                        try {
+                                                            Thread.sleep(1000);
+                                                        } catch (InterruptedException e) {
+                                                            e.printStackTrace();
+                                                        }
+                                                    }
                                                     try {
-                                                        Thread.sleep(1000);
-                                                    } catch (InterruptedException e) {
+                                                        hideStatusDialog();
+
+                                                        openLoadingProgress();
+
+
+                                                        VolleyWebservice volleyWebservice = new VolleyWebservice(MainActivity.this, "JobFragment", "Please wait", AppConfig.URL_UPLOAD, request_object);
+
+                                                    } catch (Exception e) {
                                                         e.printStackTrace();
                                                     }
                                                 }
-                                                try {
-                                                    hideStatusDialog();
-
-                                                    openLoadingProgress();
 
 
-                                                        VolleyWebservice volleyWebservice = new VolleyWebservice( MainActivity.this, "JobFragment", "Please wait", AppConfig.URL_UPLOAD, request_object);
+                                            });
 
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-                                            }
-
-
-                                        });
-
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
-                        }
-                    };
-                    mThread.start();
-                } else {
-                    //no inventories to upload for the current job
-                    new CustomDialog().dialog_ok_button(MainActivity.this, getResources().getString(R.string.msg_enable_internet));
+                        };
+                        mThread.start();
+                    } else {
+                        //no inventories to upload for the current job
+                        new CustomDialog().dialog_ok_button(MainActivity.this, getResources().getString(R.string.msg_enable_internet));
 
+                    }
+
+
+                    String str1 = "kamlesh";
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
 
 
-                String str1 = "kamlesh";
+            } else {
+                new CustomDialog().dialog_ok_button(MainActivity.this, getResources().getString(R.string.msg_no_record_found));
 
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
             }
-
-
-
 
         } else {
             new CustomDialog().dialog_ok_button(MainActivity.this, getResources().getString(R.string.msg_enable_internet));
@@ -964,4 +963,208 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void generateInventoryReport() {
+
+
+// inventory details for the current job
+        final String table_name = session.getString(session.KEY_AUDITOR_JOB_TABLE_NAME);
+        final InventoryDB inventoryDB = new InventoryDB();
+
+
+
+        //  int total_inventory = inventoryDB.getTotalInventoryCount(table_name, MainActivity.this);
+        int total_inventory = inventoryDB.getTotalInventoryCount(table_name, MainActivity.this);
+
+        // if (total_inventory > 0) {
+        if (true) {
+
+
+            final String date = new Tools().formattedDatewithSec();
+
+
+            // total length
+            CURRENT_PROGRESS = 0;
+            MAX_UPLOAD = 0;
+            this.context = getApplicationContext();
+            //  session = new SessionManager(context);
+
+            progressDialog_status = new ProgressDialog(MainActivity.this);
+            progressDialog_status.setCancelable(false);
+            //progressDialog_status.setTitle("Please Wait");
+            progressDialog_status.setMessage("Uploading Inventories..");
+            progressDialog_status.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            // progressDialog_status.setProgressNumberFormat(null);
+            progressDialog_status.setProgress(0);
+
+
+            //  if (!table_name.isEmpty() || !table_name.equalsIgnoreCase("")) {
+            if (true) {
+
+                // total inventory
+                //InventoryDB inventoryDB = new InventoryDB();
+                MAX_UPLOAD = inventoryDB.getTotalInventoryCount(table_name, MainActivity.this);
+                // MAX_UPLOAD = MAX_UPLOAD + MAX_UPLOAD;
+                progressDialog_status.setMax(MAX_UPLOAD);
+
+                /*    if (MAX_UPLOAD == 0) {
+                    } else {*/
+                showStatusDialog();
+                //    }
+
+                if (mThread != null) {
+                    mThread = null;
+                }
+
+                mThread = new Thread() {
+                    public void run() {
+
+
+                        progressBarHandler1
+                                .post(new Runnable() {
+                                    public void run() {
+                                        progressDialog_status.setProgress(CURRENT_PROGRESS);
+                                    }
+                                });
+
+                        try {
+
+
+                            File wallpaperDirectory = new File("/sdcard/Wallpaper2");
+                            wallpaperDirectory.mkdirs();
+
+                            // create directory and excel file
+                            File sd = Environment.getExternalStorageDirectory();
+                            String csvFile = date + ".xls";
+
+                            String root_sd = Environment.getExternalStorageDirectory().toString();
+                            File SDCardRootFolder = new File(root_sd + "/BlueChipInventory");
+
+                            if (!SDCardRootFolder.exists()) {
+                                SDCardRootFolder.mkdirs();
+                            }
+
+                            File file = new File(SDCardRootFolder, csvFile);
+                            WorkbookSettings wbSettings = new WorkbookSettings();
+                            wbSettings.setLocale(new Locale("en", "EN"));
+                            WritableWorkbook workbook;
+                            workbook = Workbook.createWorkbook(file, wbSettings);
+                            //Excel sheet name. 0 represents first sheet
+                            WritableSheet sheet = workbook.createSheet("" + date, 0);
+
+                                /*List<InventoryModel> inventoryList = new ArrayList<InventoryModel>();
+                                inventoryList = inventoryDB.getInventoryList(table_name, MainActivity.this);
+*/
+                            List<MasterInventoryModel> inventoryList = new ArrayList<MasterInventoryModel>();
+                            String table = session.getString(session.KEY_MASTER_TABLE_NAME);
+                            inventoryList = inventoryDB.getMasterList(table, MainActivity.this);
+
+                            // SKU, DESCRIPTION, PRICE, QUANTITY, and CATEGORY
+
+                            // column and row
+                            sheet.addCell(new Label(0, 0, "JOB")); // column and row
+                            sheet.addCell(new Label(1, 0, ""+AppConstant.KEY_JOB_ID)); // column and row
+
+                            // fields
+                            sheet.addCell(new Label(0, 2, "CATEGORY")); // column and row
+                            sheet.addCell(new Label(1, 2, "SKU"));
+                            sheet.addCell(new Label(2, 2, "PRICE"));
+                            sheet.addCell(new Label(3, 2, "DESC"));
+
+                            for (int i = 0; i < inventoryList.size(); i++) {
+
+                                // InventoryModel inventoryModel = inventoryList.get(i);
+                                MasterInventoryModel inventoryModel = inventoryList.get(i);
+
+                                sheet.addCell(new Label(0, i + 3, inventoryModel.getPrd_category()));
+                                sheet.addCell(new Label(1, i + 3, inventoryModel.getPrd_sku()));
+                                sheet.addCell(new Label(2, i + 3, inventoryModel.getPrd_price()));
+                                sheet.addCell(new Label(3, i + 3, inventoryModel.getPrd_desc()));
+                                //closing cursor
+
+                                String str_progress_message= inventoryModel.getPrd_category();
+
+                                CURRENT_PROGRESS++;
+                                try {
+                                    Thread.sleep(100);
+                                    progressDialog_status.setProgress(CURRENT_PROGRESS);
+
+
+
+
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+
+                            Log.e(TAG,""+CURRENT_PROGRESS);
+
+
+                            }
+
+
+
+
+
+                            workbook.write();
+
+
+                            workbook.close();
+
+
+                            // completed
+                            progressBarHandler1
+                                    .post(new Runnable() {
+                                        public void run() {
+
+
+                                            if (CURRENT_PROGRESS >= MAX_UPLOAD) {
+                                                progressDialog_status.setTitle("Done");
+
+                                                try {
+                                                    Thread.sleep(1000);
+                                                } catch (InterruptedException e) {
+                                                    e.printStackTrace();
+                                                }
+
+                                                try {
+                                                    hideStatusDialog();
+                                                    //openLoadingProgress();
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        }
+
+                                    });
+                            Log.e(TAG,""+CURRENT_PROGRESS);
+
+/*                               if (progressLoading.isShowing()) {
+                                    progressLoading.dismiss();
+                                }*/
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+
+                };
+                mThread.start();
+
+
+            } else {
+                //no inventories to upload for the current job
+                new CustomDialog().dialog_ok_button(MainActivity.this, getResources().getString(R.string.msg_enable_internet));
+
+            }
+
+
+            String str1 = "kamlesh";
+
+
+        } else {
+            new CustomDialog().dialog_ok_button(MainActivity.this, getResources().getString(R.string.msg_no_record_found));
+
+        }
+
+
+    }
 }

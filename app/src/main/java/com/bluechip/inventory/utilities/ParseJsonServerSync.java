@@ -300,7 +300,7 @@ public class ParseJsonServerSync {
                     masterInventory.setPrd_category(jsonObject1.getString("prd_category"));
                     masterInventory.setPrd_sku(jsonObject1.getString("prd_SKU"));
                     masterInventory.setPrd_desc(jsonObject1.getString("prd_description"));
-                    masterInventory.setPrd_price(jsonObject1.getInt("prd_price"));
+                    masterInventory.setPrd_price(jsonObject1.getString("prd_price"));
 
 
                     inventoryDB.addMasterInventory(table_master, masterInventory, context);

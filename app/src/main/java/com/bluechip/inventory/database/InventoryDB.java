@@ -85,7 +85,7 @@ public class InventoryDB {
         values.put(DatabaseHandler.KEY_MASTER_PRD_DESCRIPTION, inventory.getPrd_desc());
         values.put(DatabaseHandler.KEY_MASTER_PRD_PRICE, inventory.getPrd_price());
 
-        int price = inventory.getPrd_price();
+        String price = inventory.getPrd_price();
 
         // Insert Row
         db.insert(TABLE_NAME_MASTER, null, values);
@@ -119,6 +119,14 @@ public class InventoryDB {
     // Master inventory details
     public MasterInventoryModel getMasterInventoryDetails(String TABLE_NAME_MASTER, Context context, String product_sku) {
 
+
+
+
+
+
+
+
+
         MasterInventoryModel inventory = new MasterInventoryModel();
         DatabaseHandler DH = new DatabaseHandler(context);
         SQLiteDatabase db = DH.OpenWritable();
@@ -136,7 +144,7 @@ public class InventoryDB {
         inventory.setPrd_sku(cursor.getString(cursor.getColumnIndex(DatabaseHandler.KEY_MASTER_PRD_SKU)));
         inventory.setPrd_desc(cursor.getString(cursor.getColumnIndex(DatabaseHandler.KEY_MASTER_PRD_DESCRIPTION)));
         inventory.setPrd_category(cursor.getString(cursor.getColumnIndex(DatabaseHandler.KEY_MASTER_PRD_CATEGORY)));
-        inventory.setPrd_price(cursor.getInt(cursor.getColumnIndex(DatabaseHandler.KEY_MASTER_PRD_PRICE)));
+        inventory.setPrd_price(cursor.getString(cursor.getColumnIndex(DatabaseHandler.KEY_MASTER_PRD_PRICE)));
 
 
         return inventory;
@@ -152,7 +160,11 @@ public class InventoryDB {
         DatabaseHandler DH = new DatabaseHandler(context);
         SQLiteDatabase db = DH.OpenWritable();
 
-        String detailsQuery = "SELECT * FROM " + TABLE_NAME_MASTER + " ;";
+        String detailsQuery = "SELECT * FROM " + TABLE_NAME_MASTER
+                + " ORDER BY "
+                + DatabaseHandler.KEY_MASTER_PRD_CATEGORY
+                + " COLLATE NOCASE ASC "
+                + " ;";
 
         Cursor cursor = db.rawQuery(detailsQuery, null);
 
@@ -166,7 +178,7 @@ public class InventoryDB {
                 inventory.setPrd_sku(cursor.getString(cursor.getColumnIndex(DatabaseHandler.KEY_MASTER_PRD_SKU)));
                 inventory.setPrd_desc(cursor.getString(cursor.getColumnIndex(DatabaseHandler.KEY_MASTER_PRD_DESCRIPTION)));
                 inventory.setPrd_category(cursor.getString(cursor.getColumnIndex(DatabaseHandler.KEY_MASTER_PRD_CATEGORY)));
-                inventory.setPrd_price(cursor.getInt(cursor.getColumnIndex(DatabaseHandler.KEY_MASTER_PRD_PRICE)));
+                inventory.setPrd_price(cursor.getString(cursor.getColumnIndex(DatabaseHandler.KEY_MASTER_PRD_PRICE)));
 
                 inventoryList.add(inventory);
             } while (cursor.moveToNext());
@@ -217,12 +229,12 @@ public class InventoryDB {
     }
 
     //Get  Count
-    public int getInventoryCount(String TABLE_NAME_INVENTORY, SQLiteDatabase db, String product_id) {
+    public int getInventoryCount(String TABLE_NAME_INVENTORY, SQLiteDatabase db, String product_sku) {
 
 
         String countQuery = "SELECT * FROM " + TABLE_NAME_INVENTORY
                 + " WHERE "
-                + DatabaseHandler.KEY_PRD_SKU + " ='" + product_id + "';";
+                + DatabaseHandler.KEY_PRD_SKU + " ='" + product_sku + "';";
 
         Cursor cursor = db.rawQuery(countQuery, null);
         int count = cursor.getCount();
@@ -259,7 +271,7 @@ public class InventoryDB {
     }
 
     // inventory details
-    public InventoryModel getInventoryDetails(String TABLE_NAME_INVENTORY, Context context, String product_id) {
+    public InventoryModel getInventoryDetails(String TABLE_NAME_INVENTORY, Context context, String product_sku) {
 
         InventoryModel inventory = new InventoryModel();
         DatabaseHandler DH = new DatabaseHandler(context);
@@ -267,7 +279,7 @@ public class InventoryDB {
 
         String detailsQuery = "SELECT * FROM " + TABLE_NAME_INVENTORY
                 + " WHERE "
-                + DatabaseHandler.KEY_PRD_ID + " ='" + product_id + "' ;";
+                + DatabaseHandler.KEY_PRD_SKU + " ='" + product_sku+ "' ;";
 
         Cursor cursor = db.rawQuery(detailsQuery, null);
 
@@ -291,7 +303,7 @@ public class InventoryDB {
     public List<InventoryModel> getInventoryList(String TABLE_NAME_INVENTORY, Context context) {
 
         List<InventoryModel> inventoryList = new ArrayList<InventoryModel>();
-        ;
+
 
         DatabaseHandler DH = new DatabaseHandler(context);
         SQLiteDatabase db = DH.OpenWritable();
@@ -321,6 +333,7 @@ public class InventoryDB {
             } while (cursor.moveToNext());
 
         }
+        db.close();
         return inventoryList;
 
     }
@@ -346,7 +359,7 @@ public class InventoryDB {
         if (count > 0) {
             table_present = true;
         }
-
+        db.close();
         return table_present;
 
     }

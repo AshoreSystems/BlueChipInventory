@@ -11,6 +11,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
@@ -20,17 +21,19 @@ import android.speech.RecognizerIntent;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bluechip.inventory.R;
+import com.bluechip.inventory.database.DatabaseHandler;
 import com.bluechip.inventory.database.InventoryDB;
 import com.bluechip.inventory.model.InventoryModel;
 import com.bluechip.inventory.model.MasterInventoryModel;
@@ -72,6 +75,9 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
     // inventory details
     MasterInventoryModel masterInventoryModel;
     InventoryDB inventoryDB;
+
+    DatabaseHandler DH;
+    SQLiteDatabase sqLiteDatabase;
 
 
     @Override
@@ -131,7 +137,7 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
         button_save.setOnClickListener(this);
 
 
-        editText_sku.addTextChangedListener(new TextWatcher() {
+        /*editText_sku.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -142,10 +148,55 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
 
             @Override
             public void afterTextChanged(Editable s) {
-                saveInventory();
+
+                int count= s.length();
+
+
+chkKey();
+
+
+
+
+
             }
         });
+*/
+        editText_sku.setImeOptions(EditorInfo.IME_ACTION_GO);
+        editText_sku.setOnEditorActionListener(new EditText.OnEditorActionListener() {
 
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                //Log.d(TAG, "onEditorAction() called");
+
+                if(event.getAction()==KeyEvent.KEYCODE_ENTER){
+                    saveInventory();
+
+                }else  if(event.getAction()==KeyEvent.ACTION_DOWN){
+
+                    saveInventory();
+
+                }else if((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (actionId == KeyEvent.KEYCODE_ENTER)){
+
+                    saveInventory();
+                }else if(actionId == KeyEvent.KEYCODE_ENTER){
+
+                    saveInventory();
+                }else if(actionId == EditorInfo.IME_ACTION_DONE){
+
+                    saveInventory();
+                }else{
+
+                    String str = "temp";
+                }
+
+                String str1;
+
+                str1= "temp";
+
+
+                return false;
+            }
+        });
         resetForm();
         editText_price.setText("");
 
@@ -162,7 +213,13 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
         // inventory details
         masterInventoryModel = new MasterInventoryModel();
         inventoryDB = new InventoryDB();
+        DH = new DatabaseHandler(InventoryActivity.this);
+
+
+
     }
+
+
 
     private void saveInventory() {
 
@@ -199,10 +256,60 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
             }
         } else {
             AppConstant.ADD_INVENTORY_STATUS = "new";
-            if (AppConstant.KEY_ONE_AT) {
+          /*  if (AppConstant.KEY_ONE_AT) {
                 quantity = quantity + 1;
             } else {
                 quantity = 0;
+            }
+*/
+
+
+            // get inventory details from master
+            if (AppConstant.ADD_INVENTORY_STATUS.equalsIgnoreCase("new")) {
+
+                editText_desc.setText("");
+                editText_price.setText("");
+
+                String product_sku= editText_sku.getText().toString().replaceAll("\\s", "");
+                String table_master = session.getString(session.KEY_MASTER_TABLE_NAME);
+                String table_inventory= session.getString(session.KEY_AUDITOR_JOB_TABLE_NAME);
+
+                sqLiteDatabase=DH.OpenWritable();
+                int inventory_count=inventoryDB.getInventoryCount(table_inventory,sqLiteDatabase,product_sku);
+                sqLiteDatabase.close();
+
+                if(inventory_count > 0){
+
+                    InventoryModel inventoryModel = inventoryDB.getInventoryDetails(table_inventory,InventoryActivity.this,product_sku);
+
+                    quantity = inventoryModel.getPrd_quantity();
+                    editText_price.setText(""+inventoryModel.getPrd_price());
+                    editText_desc.setText(""+inventoryModel.getPrd_desc());
+
+
+                }else{
+                    quantity = 0;
+
+                    try {
+                        masterInventoryModel = inventoryDB.getMasterInventoryDetails(table_master, InventoryActivity.this, product_sku);
+                        editText_price.setText("" + masterInventoryModel.getPrd_price());
+                        editText_desc.setText("" + masterInventoryModel.getPrd_desc());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+
+
+                    }
+
+
+                }
+
+                // if inventory present in auditor table
+
+                // else new entry
+
+                String temp1 = "kamlesh";
+
+                quantity = quantity+1;
             }
         }
         editText_quantity.setText("" + quantity);
@@ -212,24 +319,7 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
 
         //editText_desc.setText((editText_sku.getText().toString()).replaceAll("\\s", ""));
 
-        // get inventory details from master
-        if (AppConstant.ADD_INVENTORY_STATUS.equalsIgnoreCase("new")) {
 
-            String str_sku = editText_sku_test.getText().toString();
-            String table_master = session.getString(session.KEY_MASTER_TABLE_NAME);
-
-
-            try {
-                masterInventoryModel = inventoryDB.getMasterInventoryDetails(table_master, InventoryActivity.this, str_sku);
-                editText_price.setText("" + masterInventoryModel.getPrd_price());
-                editText_desc.setText("" + masterInventoryModel.getPrd_desc());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-
-            String temp1 = "kamlesh";
-        }
 
 
         if (!AppConstant.KEY_ONE_AT) {
@@ -383,6 +473,7 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
         }
     }
 
+    // calculating speech to text quantity
     private void setQuantity(String result) {
 
         String text[] = derialize(result);

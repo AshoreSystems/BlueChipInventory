@@ -99,6 +99,14 @@ public class Tools {
 		SimpleDateFormat dfwithtime = new SimpleDateFormat("yyyy-dd-MM");
 		formattedDatewithTime=dfwithtime.format(c.getTime());
 		return formattedDatewithTime;
+
+	}public static String formattedDatewithSec()
+	{
+		String formattedDatewithTime;
+		Calendar c = Calendar.getInstance();
+		SimpleDateFormat dfwithtime = new SimpleDateFormat("yyyy-dd-MM_HH:mm:ss");
+		formattedDatewithTime=dfwithtime.format(c.getTime());
+		return formattedDatewithTime;
 	}
 
 	public static String stringToDate(String str_date) {
