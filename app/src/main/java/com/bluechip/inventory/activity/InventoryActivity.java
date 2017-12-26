@@ -54,6 +54,7 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
     private View mActionCustomView;
     LinearLayout linearLay_btn_back, linearLay_btn_share;
 
+    TextView textView_emp_id, textView_area, textView_sub_area, textView_section, textView_sub_section;
     EditText editText_sku, editText_sku_test, editText_price, editText_quantity, editText_desc, editText_test;
 
     Button button_reset, button_save;
@@ -121,6 +122,21 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
 
         session = new SessionManager(InventoryActivity.this);
 
+        //textView
+        textView_emp_id = (TextView) findViewById(R.id.textView_emp_id);
+
+        textView_area = (TextView) findViewById(R.id.textView_area);
+        textView_sub_area = (TextView) findViewById(R.id.textView_sub_area);
+        textView_section = (TextView) findViewById(R.id.textView_section);
+        textView_sub_section = (TextView) findViewById(R.id.textView_sub_section);
+
+        textView_emp_id.setText(session.getString(session.KEY_AUDITOR_ID));
+        textView_area.setText(AppConstant.KEY_JOB_AREA);
+        textView_sub_area .setText(AppConstant.KEY_JOB_SUB_AREA);
+        textView_section .setText(AppConstant.KEY_JOB_SECTION);
+        textView_sub_section .setText(AppConstant.KEY_JOB_SUB_SECTION);
+
+        //editText
         editText_sku = (EditText) findViewById(R.id.editText_sku);
         editText_sku_test = (EditText) findViewById(R.id.editText_sku_test);
         editText_sku_test.setFocusable(false);
@@ -167,31 +183,31 @@ chkKey();
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 //Log.d(TAG, "onEditorAction() called");
 
-                if(event.getAction()==KeyEvent.KEYCODE_ENTER){
+                if (event.getAction() == KeyEvent.KEYCODE_ENTER) {
                     saveInventory();
 
-                }else  if(event.getAction()==KeyEvent.ACTION_DOWN){
+                } else if (event.getAction() == KeyEvent.ACTION_DOWN) {
 
                     saveInventory();
 
-                }else if((event.getAction() == KeyEvent.ACTION_DOWN) &&
-                        (actionId == KeyEvent.KEYCODE_ENTER)){
+                } else if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (actionId == KeyEvent.KEYCODE_ENTER)) {
 
                     saveInventory();
-                }else if(actionId == KeyEvent.KEYCODE_ENTER){
+                } else if (actionId == KeyEvent.KEYCODE_ENTER) {
 
                     saveInventory();
-                }else if(actionId == EditorInfo.IME_ACTION_DONE){
+                } else if (actionId == EditorInfo.IME_ACTION_DONE) {
 
                     saveInventory();
-                }else{
+                } else {
 
                     String str = "temp";
                 }
 
                 String str1;
 
-                str1= "temp";
+                str1 = "temp";
 
 
                 return false;
@@ -216,9 +232,7 @@ chkKey();
         DH = new DatabaseHandler(InventoryActivity.this);
 
 
-
     }
-
 
 
     private void saveInventory() {
@@ -270,24 +284,24 @@ chkKey();
                 editText_desc.setText("");
                 editText_price.setText("");
 
-                String product_sku= editText_sku.getText().toString().replaceAll("\\s", "");
+                String product_sku = editText_sku.getText().toString().replaceAll("\\s", "");
                 String table_master = session.getString(session.KEY_MASTER_TABLE_NAME);
-                String table_inventory= session.getString(session.KEY_AUDITOR_JOB_TABLE_NAME);
+                String table_inventory = session.getString(session.KEY_AUDITOR_JOB_TABLE_NAME);
 
-                sqLiteDatabase=DH.OpenWritable();
-                int inventory_count=inventoryDB.getInventoryCount(table_inventory,sqLiteDatabase,product_sku);
+                sqLiteDatabase = DH.OpenWritable();
+                int inventory_count = inventoryDB.getInventoryCount(table_inventory, sqLiteDatabase, product_sku);
                 sqLiteDatabase.close();
 
-                if(inventory_count > 0){
+                if (inventory_count > 0) {
 
-                    InventoryModel inventoryModel = inventoryDB.getInventoryDetails(table_inventory,InventoryActivity.this,product_sku);
+                    InventoryModel inventoryModel = inventoryDB.getInventoryDetails(table_inventory, InventoryActivity.this, product_sku);
 
                     quantity = inventoryModel.getPrd_quantity();
-                    editText_price.setText(""+inventoryModel.getPrd_price());
-                    editText_desc.setText(""+inventoryModel.getPrd_desc());
+                    editText_price.setText("" + inventoryModel.getPrd_price());
+                    editText_desc.setText("" + inventoryModel.getPrd_desc());
 
 
-                }else{
+                } else {
                     quantity = 0;
 
                     try {
@@ -309,7 +323,7 @@ chkKey();
 
                 String temp1 = "kamlesh";
 
-                quantity = quantity+1;
+                quantity = quantity + 1;
             }
         }
         editText_quantity.setText("" + quantity);
@@ -318,8 +332,6 @@ chkKey();
         String str = editText_sku.getText().toString().replaceAll("\\s", "");
 
         //editText_desc.setText((editText_sku.getText().toString()).replaceAll("\\s", ""));
-
-
 
 
         if (!AppConstant.KEY_ONE_AT) {
@@ -386,12 +398,15 @@ chkKey();
                 break;
 
             case R.id.button_save:
+
+                // resetForm();
                 if (editText_sku_test.getText().toString().isEmpty() || editText_sku_test.getText().toString().equalsIgnoreCase("")) {
-                     Toast.makeText(getApplicationContext(), "Please Scan the SKU", Toast.LENGTH_SHORT).show();
-                }else{
+                    Toast.makeText(getApplicationContext(), "Please Scan the SKU", Toast.LENGTH_SHORT).show();
+                } else if(!editText_sku.getText().toString().isEmpty() && !editText_quantity.getText().toString().isEmpty()) {
+                    saveInventoryToDB();
+                }else {
                     saveInventoryToDB();
                 }
-               // resetForm();
                 break;
         }
     }
@@ -616,7 +631,7 @@ chkKey();
                         },
                         10);
                 String str = "temp" + PERMISSION_COUNT;
-               PERMISSION_COUNT++;
+                PERMISSION_COUNT++;
             }
 
             boolean hasPermissionDenied = (ContextCompat.checkSelfPermission(InventoryActivity.this,

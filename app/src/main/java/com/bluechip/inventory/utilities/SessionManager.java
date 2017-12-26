@@ -23,8 +23,8 @@ public class SessionManager {
     private static final String PREF_NAME = "BlueChipLogin";
 
     public static final String KEY_IS_LOGGED_IN = "isLoggedIn";
-    public static final String KEY_USER_EMAIL = "userEmail";
-    public static final String KEY_USER_ID = "userId";
+    public static final String KEY_AUDITOR_EMAIL = "userEmail";
+    public static final String KEY_AUDITOR_ID = "userId";
     public static final String KEY_AUDITOR_JOB_TABLE_NAME = "defaut";
     public static final String KEY_MASTER_TABLE_NAME = "master";
 

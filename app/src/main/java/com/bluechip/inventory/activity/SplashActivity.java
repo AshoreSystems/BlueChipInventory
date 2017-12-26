@@ -85,7 +85,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
 
         // Check if user is already logged in or not
-        if (session.isLoggedIn() && !session.getString(session.KEY_USER_ID).isEmpty()) {
+        if (session.isLoggedIn() && !session.getString(session.KEY_AUDITOR_ID).isEmpty()) {
             // User is already logged in. Take him to main activity
             Intent i = new Intent(SplashActivity.this, MainActivity.class);
             startActivity(i);

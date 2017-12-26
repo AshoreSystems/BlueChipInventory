@@ -257,9 +257,14 @@ public class JobsFragment extends Fragment implements View.OnClickListener {
         AppConstant.KEY_JOB_CUST_ID = jobModel.getJob_cust_id();
         AppConstant.KEY_JOB_LOC_ID = jobModel.getLocation_id();
 
+        AppConstant.KEY_JOB_AREA= jobModel.getArea_name();
+        AppConstant.KEY_JOB_SUB_AREA= jobModel.getSub_area_name();
+        AppConstant.KEY_JOB_SECTION= jobModel.getSec_name();
+        AppConstant.KEY_JOB_SUB_SECTION= jobModel.getSub_section_name();
+
         // auditor_job_table
         String table_inventory_auditor_job = "table_inventory_aud"
-                + session.getString(session.KEY_USER_ID).toString()
+                + session.getString(session.KEY_AUDITOR_ID).toString()
                 + "_job"
                 + job_id;
 
@@ -350,7 +355,7 @@ public class JobsFragment extends Fragment implements View.OnClickListener {
             jobList = null;
         }
 
-        jobList = jobsDB.getJobList(session.getString(session.KEY_USER_ID), context);
+        jobList = jobsDB.getJobList(session.getString(session.KEY_AUDITOR_ID), context);
 
         recycler_view_job.setHasFixedSize(true);
         recycler_view_job.setLayoutManager(new LinearLayoutManager(getActivity()));

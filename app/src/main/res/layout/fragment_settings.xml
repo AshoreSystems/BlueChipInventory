@@ -22,7 +22,7 @@
         android:layout_marginBottom="5dp"
         android:gravity="right"
         android:layout_gravity="bottom"
-        android:text="build : 12152017"
+        android:text="build : 12252017"
         android:textSize="@dimen/text_version"
         android:textColor="@color/color_app_blue"
         />

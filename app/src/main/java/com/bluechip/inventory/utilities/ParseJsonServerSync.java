@@ -232,7 +232,7 @@ public class ParseJsonServerSync {
             // save login session
             String str = jsonObject_auditor_details.getString("user_email");
 
-            session.putString(session.KEY_USER_ID, jsonObject_auditor_details.getString("user_email"));
+            session.putString(session.KEY_AUDITOR_ID, jsonObject_auditor_details.getString("user_email"));
             session.setLogin(true);
 
 

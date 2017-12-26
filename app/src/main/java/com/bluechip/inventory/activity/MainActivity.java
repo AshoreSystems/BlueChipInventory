@@ -43,7 +43,6 @@ import com.bluechip.inventory.fragment.JobsFragment;
 import com.bluechip.inventory.fragment.SettingsFragment;
 import com.bluechip.inventory.fragment.ViewReportFragment;
 import com.bluechip.inventory.model.InventoryModel;
-import com.bluechip.inventory.model.MasterInventoryModel;
 import com.bluechip.inventory.utilities.AppConfig;
 import com.bluechip.inventory.utilities.AppConstant;
 import com.bluechip.inventory.utilities.ConnectionDetector;
@@ -186,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
         // name, website
         txtName.setText("User name");
         txtName.setVisibility(View.INVISIBLE);
-        txtemail.setText(session.getString(session.KEY_USER_EMAIL).toString());
+        txtemail.setText(session.getString(session.KEY_AUDITOR_EMAIL).toString());
 
         imgProfile.setImageResource(R.drawable.bluechip_log);
 
@@ -765,8 +764,8 @@ public class MainActivity extends AppCompatActivity {
 
                 try {
                     // auditor
-                    auditor_detail.put(JsonConstant.KEY_user_id, session.getString(session.KEY_USER_ID));
-                    auditor_detail.put(JsonConstant.KEY_user_email, session.getString(session.KEY_USER_EMAIL));
+                    auditor_detail.put(JsonConstant.KEY_user_id, session.getString(session.KEY_AUDITOR_ID));
+                    auditor_detail.put(JsonConstant.KEY_user_email, session.getString(session.KEY_AUDITOR_EMAIL));
 
                     // job_details
                     job_detail.put(JsonConstant.KEY_job_id, "" + AppConstant.KEY_JOB_ID);
@@ -975,8 +974,8 @@ public class MainActivity extends AppCompatActivity {
         //  int total_inventory = inventoryDB.getTotalInventoryCount(table_name, MainActivity.this);
         int total_inventory = inventoryDB.getTotalInventoryCount(table_name, MainActivity.this);
 
-        // if (total_inventory > 0) {
-        if (true) {
+        if (total_inventory > 0) {
+       // if (true) {
 
 
             final String date = new Tools().formattedDatewithSec();
@@ -997,8 +996,8 @@ public class MainActivity extends AppCompatActivity {
             progressDialog_status.setProgress(0);
 
 
-            //  if (!table_name.isEmpty() || !table_name.equalsIgnoreCase("")) {
-            if (true) {
+           if (!table_name.isEmpty() || !table_name.equalsIgnoreCase("")) {
+           // if (true) {
 
                 // total inventory
                 //InventoryDB inventoryDB = new InventoryDB();
@@ -1051,12 +1050,12 @@ public class MainActivity extends AppCompatActivity {
                             //Excel sheet name. 0 represents first sheet
                             WritableSheet sheet = workbook.createSheet("" + date, 0);
 
-                                /*List<InventoryModel> inventoryList = new ArrayList<InventoryModel>();
+                                List<InventoryModel> inventoryList = new ArrayList<InventoryModel>();
                                 inventoryList = inventoryDB.getInventoryList(table_name, MainActivity.this);
-*/
-                            List<MasterInventoryModel> inventoryList = new ArrayList<MasterInventoryModel>();
+
+                          //  List<MasterInventoryModel> inventoryList = new ArrayList<MasterInventoryModel>();
                             String table = session.getString(session.KEY_MASTER_TABLE_NAME);
-                            inventoryList = inventoryDB.getMasterList(table, MainActivity.this);
+                          //  inventoryList = inventoryDB.getMasterList(table, MainActivity.this);
 
                             // SKU, DESCRIPTION, PRICE, QUANTITY, and CATEGORY
 
@@ -1069,16 +1068,18 @@ public class MainActivity extends AppCompatActivity {
                             sheet.addCell(new Label(1, 2, "SKU"));
                             sheet.addCell(new Label(2, 2, "PRICE"));
                             sheet.addCell(new Label(3, 2, "DESC"));
+                            sheet.addCell(new Label(4, 2, "QUANTITY"));
 
                             for (int i = 0; i < inventoryList.size(); i++) {
 
-                                // InventoryModel inventoryModel = inventoryList.get(i);
-                                MasterInventoryModel inventoryModel = inventoryList.get(i);
+                               InventoryModel inventoryModel = inventoryList.get(i);
+                              //  MasterInventoryModel inventoryModel = inventoryList.get(i);
 
                                 sheet.addCell(new Label(0, i + 3, inventoryModel.getPrd_category()));
                                 sheet.addCell(new Label(1, i + 3, inventoryModel.getPrd_sku()));
-                                sheet.addCell(new Label(2, i + 3, inventoryModel.getPrd_price()));
+                                sheet.addCell(new Label(2, i + 3, ""+inventoryModel.getPrd_price()));
                                 sheet.addCell(new Label(3, i + 3, inventoryModel.getPrd_desc()));
+                                sheet.addCell(new Label(4, i + 3, ""+inventoryModel.getPrd_quantity()));
                                 //closing cursor
 
                                 String str_progress_message= inventoryModel.getPrd_category();

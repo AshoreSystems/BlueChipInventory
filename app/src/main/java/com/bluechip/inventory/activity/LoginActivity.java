@@ -46,9 +46,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static android.Manifest.permission.READ_CONTACTS;
 import static com.bluechip.inventory.R.id.email;
 
@@ -461,8 +458,8 @@ public class LoginActivity extends Activity {
 
                     // save login session
                     String str = jsonObject_auditor_details.getString("user_email");
-                    session.putString(session.KEY_USER_EMAIL, jsonObject_auditor_details.getString("user_email"));
-                    session.putString(session.KEY_USER_ID, jsonObject_auditor_details.getString("user_id"));
+                    session.putString(session.KEY_AUDITOR_EMAIL, jsonObject_auditor_details.getString("user_email"));
+                    session.putString(session.KEY_AUDITOR_ID, jsonObject_auditor_details.getString("user_id"));
                     session.setLogin(true);
 
 
@@ -602,12 +599,12 @@ public class LoginActivity extends Activity {
                     }
 
 
-                    //  checking Master List
+                   /* //  checking Master List
                     InventoryDB inventoryDBchk = new InventoryDB();
                     String table_master = "table_master_costumer1";
                     List<MasterInventoryModel> masterList = new ArrayList<MasterInventoryModel>();
                     masterList = inventoryDBchk.getMasterList("table_master_costumer1", context);
-
+*/
                     progressBarHandler1
                             .post(new Runnable() {
                                 public void run() {

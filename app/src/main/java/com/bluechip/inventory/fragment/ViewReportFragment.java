@@ -229,7 +229,7 @@ public class ViewReportFragment extends Fragment implements View.OnClickListener
 
         // auditor_job_table
         String table_inventory_auditor_job = "table_inventory_aud"
-                + session.getString(session.KEY_USER_ID).toString()
+                + session.getString(session.KEY_AUDITOR_ID).toString()
                 + "_job"
                 + job_id;
 
@@ -318,7 +318,7 @@ public class ViewReportFragment extends Fragment implements View.OnClickListener
             jobList = null;
         }
 
-        jobList = jobsDB.getJobList(session.getString(session.KEY_USER_ID), context);
+        jobList = jobsDB.getJobList(session.getString(session.KEY_AUDITOR_ID), context);
 
         recycler_view_job.setHasFixedSize(true);
         recycler_view_job.setLayoutManager(new LinearLayoutManager(getActivity()));

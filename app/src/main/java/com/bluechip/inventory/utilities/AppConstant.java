@@ -21,4 +21,8 @@ public class AppConstant {
     public static  int KEY_JOB_ID = 1;
     public static int KEY_JOB_CUST_ID=1;
     public static String KEY_JOB_LOC_ID="";
+    public static String KEY_JOB_AREA="";
+    public static String KEY_JOB_SUB_AREA="";
+    public static String KEY_JOB_SECTION="";
+    public static String KEY_JOB_SUB_SECTION="";
 }
