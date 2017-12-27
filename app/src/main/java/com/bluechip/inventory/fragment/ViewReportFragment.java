@@ -187,19 +187,26 @@ public class ViewReportFragment extends Fragment implements View.OnClickListener
 
             case R.id.fab_generate_report:
 
-                try {
+                if(((MainActivity) getActivity()).hasPermission()){
 
-                    if (((MainActivity) getActivity()).isInternetOn()) {
+                    try {
 
-                        ((MainActivity) getActivity()).generateInventoryReport();
-                    } else {
-                        new CustomDialog().dialog_ok_button(context, getResources().getString(R.string.msg_enable_internet));
+                        if (((MainActivity) getActivity()).isInternetOn()) {
+
+                            ((MainActivity) getActivity()).generateInventoryReport();
+                        } else {
+                            new CustomDialog().dialog_ok_button(context, getResources().getString(R.string.msg_enable_internet));
 
 
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+
+                }else{
+                    ((MainActivity) getActivity()).requestPermissionDialog();
                 }
+
                /* DatabaseHandler DH= new DatabaseHandler(context);
                 SQLiteDatabase db = DH.OpenWritable();
 

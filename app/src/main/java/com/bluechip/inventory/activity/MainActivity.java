@@ -652,26 +652,34 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void requestPermissionDialog() {
+    public boolean hasPermission() {
+        boolean permission = true;
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            permission = false;
+        }
+        return permission;
+    }
+
+    public void requestPermissionDialog() {
 
         permissionStatus = getSharedPreferences("permissionStatus", MODE_PRIVATE);
 
 
-        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.RECORD_AUDIO)) {
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 //Show Information about why you need the permission
                 //  showDialog(InventoryActivity.this,"ok");
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setInverseBackgroundForced(true);
-                builder.setTitle(" Record Audio Permission");
+                builder.setTitle(" Write to Storage Permission");
 
-                builder.setMessage("This app needs Record permission.");
+                builder.setMessage("This app needs Storage permission.");
                 builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
-                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECORD_AUDIO}, EXTERNAL_STORAGE_PERMISSION_CONSTANT);
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_PERMISSION_CONSTANT);
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -681,7 +689,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
                 builder.show();
-            } else if (permissionStatus.getBoolean(Manifest.permission.RECORD_AUDIO, false)) {
+            } else if (permissionStatus.getBoolean(Manifest.permission.WRITE_EXTERNAL_STORAGE, false)) {
                 //Previously Permission Request was cancelled with 'Dont Ask Again',
                 // Redirect to Settings after showing Information about why you need the permission
 
@@ -690,8 +698,8 @@ public class MainActivity extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setInverseBackgroundForced(true);
 
-                builder.setTitle(" Record Audio Permission");
-                builder.setMessage("This app needs Record permission.");
+                builder.setTitle(" Write to Storage Permission");
+                builder.setMessage("This app needs Storage permission.");
                 builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -713,11 +721,11 @@ public class MainActivity extends AppCompatActivity {
                 builder.show();
             } else {
                 //just request the permission
-                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECORD_AUDIO}, EXTERNAL_STORAGE_PERMISSION_CONSTANT);
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_PERMISSION_CONSTANT);
             }
 
             SharedPreferences.Editor editor = permissionStatus.edit();
-            editor.putBoolean(Manifest.permission.RECORD_AUDIO, true);
+            editor.putBoolean(Manifest.permission.WRITE_EXTERNAL_STORAGE, true);
             editor.commit();
 
 
@@ -970,12 +978,11 @@ public class MainActivity extends AppCompatActivity {
         final InventoryDB inventoryDB = new InventoryDB();
 
 
-
         //  int total_inventory = inventoryDB.getTotalInventoryCount(table_name, MainActivity.this);
         int total_inventory = inventoryDB.getTotalInventoryCount(table_name, MainActivity.this);
 
         if (total_inventory > 0) {
-       // if (true) {
+            // if (true) {
 
 
             final String date = new Tools().formattedDatewithSec();
@@ -996,8 +1003,8 @@ public class MainActivity extends AppCompatActivity {
             progressDialog_status.setProgress(0);
 
 
-           if (!table_name.isEmpty() || !table_name.equalsIgnoreCase("")) {
-           // if (true) {
+            if (!table_name.isEmpty() || !table_name.equalsIgnoreCase("")) {
+                // if (true) {
 
                 // total inventory
                 //InventoryDB inventoryDB = new InventoryDB();
@@ -1050,18 +1057,18 @@ public class MainActivity extends AppCompatActivity {
                             //Excel sheet name. 0 represents first sheet
                             WritableSheet sheet = workbook.createSheet("" + date, 0);
 
-                                List<InventoryModel> inventoryList = new ArrayList<InventoryModel>();
-                                inventoryList = inventoryDB.getInventoryList(table_name, MainActivity.this);
+                            List<InventoryModel> inventoryList = new ArrayList<InventoryModel>();
+                            inventoryList = inventoryDB.getInventoryList(table_name, MainActivity.this);
 
-                          //  List<MasterInventoryModel> inventoryList = new ArrayList<MasterInventoryModel>();
+                            //  List<MasterInventoryModel> inventoryList = new ArrayList<MasterInventoryModel>();
                             String table = session.getString(session.KEY_MASTER_TABLE_NAME);
-                          //  inventoryList = inventoryDB.getMasterList(table, MainActivity.this);
+                            //  inventoryList = inventoryDB.getMasterList(table, MainActivity.this);
 
                             // SKU, DESCRIPTION, PRICE, QUANTITY, and CATEGORY
 
                             // column and row
                             sheet.addCell(new Label(0, 0, "JOB")); // column and row
-                            sheet.addCell(new Label(1, 0, ""+AppConstant.KEY_JOB_ID)); // column and row
+                            sheet.addCell(new Label(1, 0, "" + AppConstant.KEY_JOB_ID)); // column and row
 
                             // fields
                             sheet.addCell(new Label(0, 2, "CATEGORY")); // column and row
@@ -1072,17 +1079,17 @@ public class MainActivity extends AppCompatActivity {
 
                             for (int i = 0; i < inventoryList.size(); i++) {
 
-                               InventoryModel inventoryModel = inventoryList.get(i);
-                              //  MasterInventoryModel inventoryModel = inventoryList.get(i);
+                                InventoryModel inventoryModel = inventoryList.get(i);
+                                //  MasterInventoryModel inventoryModel = inventoryList.get(i);
 
                                 sheet.addCell(new Label(0, i + 3, inventoryModel.getPrd_category()));
                                 sheet.addCell(new Label(1, i + 3, inventoryModel.getPrd_sku()));
-                                sheet.addCell(new Label(2, i + 3, ""+inventoryModel.getPrd_price()));
+                                sheet.addCell(new Label(2, i + 3, "" + inventoryModel.getPrd_price()));
                                 sheet.addCell(new Label(3, i + 3, inventoryModel.getPrd_desc()));
-                                sheet.addCell(new Label(4, i + 3, ""+inventoryModel.getPrd_quantity()));
+                                sheet.addCell(new Label(4, i + 3, "" + inventoryModel.getPrd_quantity()));
                                 //closing cursor
 
-                                String str_progress_message= inventoryModel.getPrd_category();
+                                String str_progress_message = inventoryModel.getPrd_category();
 
                                 CURRENT_PROGRESS++;
                                 try {
@@ -1090,19 +1097,14 @@ public class MainActivity extends AppCompatActivity {
                                     progressDialog_status.setProgress(CURRENT_PROGRESS);
 
 
-
-
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
 
-                            Log.e(TAG,""+CURRENT_PROGRESS);
+                                Log.e(TAG, "" + CURRENT_PROGRESS);
 
 
                             }
-
-
-
 
 
                             workbook.write();
@@ -1136,7 +1138,7 @@ public class MainActivity extends AppCompatActivity {
                                         }
 
                                     });
-                            Log.e(TAG,""+CURRENT_PROGRESS);
+                            Log.e(TAG, "" + CURRENT_PROGRESS);
 
 /*                               if (progressLoading.isShowing()) {
                                     progressLoading.dismiss();

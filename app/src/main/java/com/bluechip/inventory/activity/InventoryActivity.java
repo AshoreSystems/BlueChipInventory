@@ -132,9 +132,9 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
 
         textView_emp_id.setText(session.getString(session.KEY_AUDITOR_ID));
         textView_area.setText(AppConstant.KEY_JOB_AREA);
-        textView_sub_area .setText(AppConstant.KEY_JOB_SUB_AREA);
-        textView_section .setText(AppConstant.KEY_JOB_SECTION);
-        textView_sub_section .setText(AppConstant.KEY_JOB_SUB_SECTION);
+        textView_sub_area.setText(AppConstant.KEY_JOB_SUB_AREA);
+        textView_section.setText(AppConstant.KEY_JOB_SECTION);
+        textView_sub_section.setText(AppConstant.KEY_JOB_SUB_SECTION);
 
         //editText
         editText_sku = (EditText) findViewById(R.id.editText_sku);
@@ -194,7 +194,14 @@ chkKey();
                         (actionId == KeyEvent.KEYCODE_ENTER)) {
 
                     saveInventory();
+                } else if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (actionId == KeyEvent.KEYCODE_DPAD_CENTER)) {
+
+                    saveInventory();
                 } else if (actionId == KeyEvent.KEYCODE_ENTER) {
+
+                    saveInventory();
+                } else if (actionId == KeyEvent.KEYCODE_DPAD_CENTER) {
 
                     saveInventory();
                 } else if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -337,7 +344,13 @@ chkKey();
         if (!AppConstant.KEY_ONE_AT) {
 
             if (isInternet()) {
-                promptSpeechInput();
+
+                if (hasPermission()) {
+                    promptSpeechInput();
+                } else {
+                    requestPermissionDialog();
+
+                }
             } else {
                 noVoiceOrInternet();
                 new CustomDialog().dialog_ok_button(InventoryActivity.this, " Please enable Internet for working of \"Voice to Text\" ");
@@ -399,12 +412,13 @@ chkKey();
 
             case R.id.button_save:
 
+
                 // resetForm();
                 if (editText_sku_test.getText().toString().isEmpty() || editText_sku_test.getText().toString().equalsIgnoreCase("")) {
                     Toast.makeText(getApplicationContext(), "Please Scan the SKU", Toast.LENGTH_SHORT).show();
-                } else if(!editText_sku.getText().toString().isEmpty() && !editText_quantity.getText().toString().isEmpty()) {
+                } else if (!editText_sku.getText().toString().isEmpty() && !editText_quantity.getText().toString().isEmpty()) {
                     saveInventoryToDB();
-                }else {
+                } else {
                     saveInventoryToDB();
                 }
                 break;
@@ -540,6 +554,14 @@ chkKey();
 // requestForPermisson();
 
 
+    }
+
+    private boolean hasPermission() {
+        boolean permission = true;
+        if (ActivityCompat.checkSelfPermission(InventoryActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            permission = false;
+        }
+        return permission;
     }
 
     private void requestPermissionDialog() {
