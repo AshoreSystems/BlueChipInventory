@@ -125,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
     private static int MAX_UPLOAD = 0;
     private static int CURRENT_PROGRESS = 0;
     Context context = null;
+    private String filename="";
 
 
     @Override
@@ -1035,12 +1036,14 @@ public class MainActivity extends AppCompatActivity {
                         try {
 
 
-                            File wallpaperDirectory = new File("/sdcard/Wallpaper2");
+                            /*File wallpaperDirectory = new File("/sdcard/Wallpaper2");
                             wallpaperDirectory.mkdirs();
 
                             // create directory and excel file
-                            File sd = Environment.getExternalStorageDirectory();
+                            File sd = Environment.getExternalStorageDirectory();*/
                             String csvFile = date + ".xls";
+                            filename = csvFile;
+
 
                             String root_sd = Environment.getExternalStorageDirectory().toString();
                             File SDCardRootFolder = new File(root_sd + "/BlueChipInventory");
@@ -1146,11 +1149,20 @@ public class MainActivity extends AppCompatActivity {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+
+
+                        String str ="finishing report";
+
+                        shareTemplate();
+
                     }
 
 
                 };
                 mThread.start();
+
+
+
 
 
             } else {
@@ -1167,6 +1179,31 @@ public class MainActivity extends AppCompatActivity {
             new CustomDialog().dialog_ok_button(MainActivity.this, getResources().getString(R.string.msg_no_record_found));
 
         }
+
+
+    }
+
+
+    private void shareTemplate() {
+
+
+        String root_sd = Environment.getExternalStorageDirectory().toString();
+        String str_temp = root_sd + "/BlueChipInventory/" + filename;
+        File f = new File(str_temp);
+        Uri uri = Uri.parse("file://" + f.getAbsolutePath());
+        Intent share = new Intent(Intent.ACTION_SEND);
+        share.putExtra(Intent.EXTRA_STREAM, uri);
+
+       /* if(Build.BRAND.equalsIgnoreCase("Amazon")){
+
+        }else {
+            share.putExtra(Intent.EXTRA_TEXT, ""+getResources().getString(R.string.app_link));
+        }*/
+
+        share.setType("application/vnd.ms-excel");
+        share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(Intent.createChooser(share, "Share image File"));
+
 
 
     }
