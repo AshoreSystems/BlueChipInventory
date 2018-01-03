@@ -30,7 +30,7 @@
                 />
 
             <TextView
-                android:id="@+id/textView_emp_id"
+                android:id="@+id/textView_auditor_id"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/input_text_height"
                 android:background="@drawable/bg_square_filled"

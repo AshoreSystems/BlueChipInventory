@@ -52,9 +52,10 @@ import static android.Manifest.permission.RECORD_AUDIO;
 public class InventoryActivity extends FragmentActivity implements View.OnClickListener {
 
     private View mActionCustomView;
-    LinearLayout linearLay_btn_back, linearLay_btn_share;
+    LinearLayout linearLay_btn_back;
+    //, linearLay_btn_share;
 
-    TextView textView_emp_id, textView_area, textView_sub_area, textView_section, textView_sub_section;
+    TextView textView_auditor_id, textView_area, textView_sub_area, textView_section, textView_sub_section;
     EditText editText_sku, editText_sku_test, editText_price, editText_quantity, editText_desc, editText_test;
 
     Button button_reset, button_save;
@@ -100,8 +101,7 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
         mActionBar.setHomeButtonEnabled(true);
 
         linearLay_btn_back = (LinearLayout) mActionCustomView.findViewById(R.id.linearLay_btn_back);
-        linearLay_btn_share = (LinearLayout) mActionCustomView.findViewById(R.id.linearLay_btn_share);
-
+        // linearLay_btn_share = (LinearLayout) mActionCustomView.findViewById(linearLay_btn_share);
 
         linearLay_btn_back.setOnClickListener(this);
 
@@ -123,14 +123,14 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
         session = new SessionManager(InventoryActivity.this);
 
         //textView
-        textView_emp_id = (TextView) findViewById(R.id.textView_emp_id);
+        textView_auditor_id = (TextView) findViewById(R.id.textView_auditor_id);
 
         textView_area = (TextView) findViewById(R.id.textView_area);
         textView_sub_area = (TextView) findViewById(R.id.textView_sub_area);
         textView_section = (TextView) findViewById(R.id.textView_section);
         textView_sub_section = (TextView) findViewById(R.id.textView_sub_section);
 
-        textView_emp_id.setText(session.getString(session.KEY_AUDITOR_ID));
+        textView_auditor_id.setText(session.getString(session.KEY_AUDITOR_ID));
         textView_area.setText(AppConstant.KEY_JOB_AREA);
         textView_sub_area.setText(AppConstant.KEY_JOB_SUB_AREA);
         textView_section.setText(AppConstant.KEY_JOB_SECTION);
@@ -152,31 +152,6 @@ public class InventoryActivity extends FragmentActivity implements View.OnClickL
         button_reset.setOnClickListener(this);
         button_save.setOnClickListener(this);
 
-
-        /*editText_sku.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-                int count= s.length();
-
-
-chkKey();
-
-
-
-
-
-            }
-        });
-*/
         editText_sku.setImeOptions(EditorInfo.IME_ACTION_GO);
         editText_sku.setOnEditorActionListener(new EditText.OnEditorActionListener() {
 
@@ -329,8 +304,9 @@ chkKey();
                 // else new entry
 
                 String temp1 = "kamlesh";
-
-                quantity = quantity + 1;
+                if (AppConstant.KEY_ONE_AT) {
+                    quantity = quantity + 1;
+                }
             }
         }
         editText_quantity.setText("" + quantity);
@@ -376,7 +352,11 @@ chkKey();
             inventoryModel.setPrd_price(Integer.parseInt(editText_price.getText().toString()));
         }
 
-        inventoryModel.setPrd_quantity(Integer.parseInt(editText_quantity.getText().toString()));
+        try {
+            inventoryModel.setPrd_quantity(Integer.parseInt(editText_quantity.getText().toString()));
+        } catch (Exception e) {
+            inventoryModel.setPrd_quantity(1);
+        }
         inventoryModel.setPrd_desc(editText_desc.getText().toString());
 
         try {
@@ -502,19 +482,21 @@ chkKey();
         }
     }
 
-    // calculating speech to text quantity
+    // calculating speech to text for quantity
     private void setQuantity(String result) {
 
-        String text[] = derialize(result);
+        String text[] = deSerialize(result);
 
         int quantity = 0;
-
+        int chk_quantity = 0;
         if (!editText_quantity.getText().toString().isEmpty()) {
 
             try {
                 quantity = Integer.parseInt(editText_quantity.getText().toString().trim());
+                chk_quantity = quantity;
             } catch (Exception e) {
                 quantity = 0;
+                chk_quantity = 0;
             }
         }
 
@@ -524,15 +506,22 @@ chkKey();
                 quantity = quantity + Integer.parseInt(text[i].trim());
             } catch (Exception e) {
                 e.printStackTrace();
+                Toast.makeText(getBaseContext(), "Please try again", Toast.LENGTH_LONG).show();
+
             }
         }
 
         editText_quantity.setText("" + quantity);
+        if (quantity == chk_quantity) {
+        } else {
+            saveInventoryToDB();
+        }
+
 
     }
 
     // parsing string
-    public String[] derialize(String content) {
+    public String[] deSerialize(String content) {
         return content.split(STRING_SEPERATOR);
     }
 
